@@ -22,7 +22,9 @@ public class Partido {
     private EstadoPartido estado;
     private List<Estadistica> partidoEstadisticas;
 
-    public Partido(String fecha, int golesLocal, int golesVisitante, int probabilidadVictoriaLocal, int probabilidadVictoriaVisitante, Pais paisLocal, Pais paisVisitante, EstadoPartido estado) {
+    public Partido(String fecha, int golesLocal, int golesVisitante, int probabilidadVictoriaLocal,
+            int probabilidadVictoriaVisitante, Pais paisLocal, Pais paisVisitante, EstadoPartido estado,
+            List<Estadistica> partidoEstadisticas) {
         this.fecha = fecha;
         this.golesLocal = golesLocal;
         this.golesVisitante = golesVisitante;
@@ -31,6 +33,7 @@ public class Partido {
         this.paisLocal = paisLocal;
         this.paisVisitante = paisVisitante;
         this.estado = estado;
+        this.partidoEstadisticas = partidoEstadisticas;
     }
 
     public String getFecha() {
@@ -97,8 +100,26 @@ public class Partido {
         this.estado = estado;
     }
 
+    public List<Estadistica> getPartidoEstadisticas() {
+        return partidoEstadisticas;
+    }
+
+    public void setPartidoEstadisticas(List<Estadistica> partidoEstadisticas) {
+        this.partidoEstadisticas = partidoEstadisticas;
+    }
+
     @Override
     public String toString() {
-        return "Partido{" + "fecha=" + fecha + ", golesLocal=" + golesLocal + ", golesVisitante=" + golesVisitante + ", probabilidadVictoriaLocal=" + probabilidadVictoriaLocal + ", probabilidadVictoriaVisitante=" + probabilidadVictoriaVisitante + ", paisLocal=" + paisLocal + ", paisVisitante=" + paisVisitante + ", estado=" + estado + '}';
+        return "Partido{" +
+                "fecha='" + fecha + '\'' +
+                ", golesLocal=" + golesLocal +
+                ", golesVisitante=" + golesVisitante +
+                ", probabilidadVictoriaLocal=" + probabilidadVictoriaLocal +
+                ", probabilidadVictoriaVisitante=" + probabilidadVictoriaVisitante +
+                ", paisLocal=" + paisLocal +
+                ", paisVisitante=" + paisVisitante +
+                ", estado=" + estado +
+                ", partidoEstadisticas=" + partidoEstadisticas +
+                '}';
     }
 }

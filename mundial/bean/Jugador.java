@@ -94,4 +94,18 @@ public class Jugador {
     public void setPais(Pais pais) {
         this.pais = pais;
     }
+
+    @Override
+    public String toString() {
+        return "Jugador{" +
+                "id='" + id + '\'' +
+                ", dorsal=" + dorsal +
+                ", nombre='" + nombre + '\'' +
+                ", esTitular=" + esTitular +
+                ", goles=" + goles +
+                ", asistencia=" + asistencia +
+                ", posicion=" + posicion +
+                ", pais=" + pais +
+                '}';
+    }
 }
