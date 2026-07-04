@@ -46,6 +46,36 @@ public class JugadorDao {
         }
         return null;
     }
+
+    public void registrar(Jugador p) throws Exception {
+        if (buscarPos(p.getId()) == -1) {
+            this.lstJugadores.add(p);
+        }
+        guardar(this.lstJugadores);
+    }
+    
+    public void actualizar(Jugador p) throws Exception {
+        if (buscarPos(p.getNombre()) != -1) {
+            this.lstJugadores.set(buscarPos(p.getId()), p);
+        }
+        guardar(this.lstJugadores);
+    }
+    
+    public void eliminar(Jugador p) throws Exception {
+        int pos = buscarPos(p.getId());
+        if (pos != -1) {
+            this.lstJugadores.remove(pos);
+        }
+        guardar(this.lstJugadores);
+    }
+
+    public List<Jugador> mostrar() {
+        return lstJugadores;
+    }
+
+    public void setLstJugadores(List<Jugador> lstJugadores) {
+        this.lstJugadores = lstJugadores;
+    }
     
     public List<Jugador> leer() {
         try {
