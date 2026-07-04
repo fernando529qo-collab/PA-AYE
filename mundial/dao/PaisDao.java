@@ -12,7 +12,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
-import mundial.bean.Jugador;
 import mundial.bean.Pais;
 
 /**
