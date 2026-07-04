@@ -14,6 +14,8 @@ public class Bracket {
     
     private RondaEliminacion ronda;
     private List<Partido> bracketPartidos;
+    
+    public Bracket() {}
 
     public Bracket(RondaEliminacion ronda, List<Partido> bracketPartidos) {
         this.ronda = ronda;
