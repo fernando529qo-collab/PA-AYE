@@ -12,6 +12,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import mundial.bean.Confederacion;
 import mundial.bean.Pais;
 
 /**
@@ -47,7 +49,49 @@ public class PaisDao {
         return null;
     }
 
-    public List<Pais> getLstPaises() {
+    //Buscar por confederacion esta utilizando la clase Confederacion
+    public int buscarConf(Confederacion confederacion) {      //Retorna la posicion (En caso de que no la encuentre retorna -1)
+        for (int i = 0; i < this.lstPaises.size(); i++) {
+            if (this.lstPaises.get(i).getConfederacion().name().equalsIgnoreCase(confederacion.name())) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    //Buscar por confederacion esta utilizando la clase Confederacion
+    public Pais buscarConfederacion(Confederacion confederacion) {  //Retorna el pais (En caso de que no la encuentre retorna -1)
+        for (int i = 0; i < this.lstPaises.size(); i++) {
+            if (this.lstPaises.get(i).getConfederacion().name().equalsIgnoreCase(confederacion.name())) {
+                return this.lstPaises.get(i);
+            }
+        }
+        return null;
+    }
+
+    public void registrar(Pais p) throws Exception {
+        if (buscarPos(p.getId()) == -1) {
+            this.lstPaises.add(p);
+        }
+        guardar(this.lstPaises);
+    }
+    
+    public void actualizar(Pais p) throws Exception {
+        if (buscarPos(p.getNombre()) != -1) {
+            this.lstPaises.set(buscarPos(p.getId()), p);
+        }
+        guardar(this.lstPaises);
+    }
+    
+    public void eliminar(Pais p) throws Exception {
+        int pos = buscarPos(p.getId());
+        if (pos != -1) {
+            this.lstPaises.remove(pos);
+        }
+        guardar(this.lstPaises);
+    }
+
+    public List<Pais> mostrar() {
         return lstPaises;
     }
 

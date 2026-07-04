@@ -18,14 +18,14 @@ import mundial.bean.AdministradorFifa;
  *
  * @author ferna
  */
-public class AdministradorDao {
+public class AdministradorFifaDao {
     
     private List<AdministradorFifa> lstAdministradores;
     
     private Gson gson = new Gson();
     private File file = new File("ADMINISTRADOR.json");
 
-    public AdministradorDao() {
+    public AdministradorFifaDao() {
         this.lstAdministradores = leer();
     }
     

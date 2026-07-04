@@ -13,25 +13,26 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import mundial.bean.DirectorFederacion;
+import mundial.bean.Pais;
 
 /**
  *
  * @author ferna
  */
-public class DirectorTecnicoDao {
+public class DirectorFederacionDao {
     
-    private List<DirectorFederacion> lstDirectoresTecnicos;
+    private List<DirectorFederacion> lstDirectoresFederaciones;
     
     private Gson gson = new Gson();
     private File file = new File("DIRECTORES_TECNICOS.json");
 
-    public DirectorTecnicoDao() {
-        this.lstDirectoresTecnicos = leer();
+    public DirectorFederacionDao() {
+        this.lstDirectoresFederaciones = leer();
     }
     
     public int buscarPos(String id) {      //Retorna la posicion (En caso de que no la encuentre retorna -1)
-        for (int i = 0; i < this.lstDirectoresTecnicos.size(); i++) {
-            if (this.lstDirectoresTecnicos.get(i).getId().equalsIgnoreCase(id)) {
+        for (int i = 0; i < this.lstDirectoresFederaciones.size(); i++) {
+            if (this.lstDirectoresFederaciones.get(i).getId().equalsIgnoreCase(id)) {
                 return i;
             }
         }
@@ -39,20 +40,34 @@ public class DirectorTecnicoDao {
     }
     
     public DirectorFederacion buscarObj(String id) {   //Retorna el Director Tecnico (En caso de que no la encuentre retorna null)
-        for (int i = 0; i < this.lstDirectoresTecnicos.size(); i++) {
-            if (this.lstDirectoresTecnicos.get(i).getId().equalsIgnoreCase(id)) {
-                return this.lstDirectoresTecnicos.get(i);
+        for (int i = 0; i < this.lstDirectoresFederaciones.size(); i++) {
+            if (this.lstDirectoresFederaciones.get(i).getId().equalsIgnoreCase(id)) {
+                return this.lstDirectoresFederaciones.get(i);
             }
         }
         return null;
     }
-
-    public List<DirectorFederacion> getLstDirectoresTecnicos() {
-        return lstDirectoresTecnicos;
+    
+    public void crearCuentas(List<Pais> paisesCrear) throws Exception {  //Recibe a los paises registrados para 
+        for (int i = 0; i < 48; i++) {                  //crear las cuentas de Director Federacion
+            String id = (i+1)+"";
+            String nombre = paisesCrear.get(i).getNombre().toUpperCase(); //Converte el nombre del pais en mayuscula
+            String contraseña = paisesCrear.get(i).getNombre().toLowerCase()+paisesCrear.get(i).getRankingFifa();
+            //La contraseña es el nombre del pais en minuscula mas el numero de rankingFifa
+            Pais pais = paisesCrear.get(i);
+            boolean habilitado = true;
+            DirectorFederacion director = new DirectorFederacion(id, nombre, contraseña, habilitado, pais);
+            this.lstDirectoresFederaciones.add(director);
+        }
+        guardar(this.lstDirectoresFederaciones);
     }
 
-    public void setLstDirectoresTecnicos(List<DirectorFederacion> lstDirectoresTecnicos) {
-        this.lstDirectoresTecnicos = lstDirectoresTecnicos;
+    public List<DirectorFederacion> mostrar() {
+        return this.lstDirectoresFederaciones;
+    }
+
+    public void setLstDirectoresFederaciones(List<DirectorFederacion> lstDirectoresFederaciones) {
+        this.lstDirectoresFederaciones = lstDirectoresFederaciones;
     }
     
     public List<DirectorFederacion> leer() {
