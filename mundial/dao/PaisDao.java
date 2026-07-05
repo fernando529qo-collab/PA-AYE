@@ -91,6 +91,16 @@ public class PaisDao {
         guardar(this.lstPaises);
     }
 
+    public List<Pais> mostrarConfederacion(Confederacion c) {
+        List<Pais> paises = new ArrayList<>();
+        for (Pais pais : this.lstPaises) {
+            if (pais.getConfederacion().name().equalsIgnoreCase(c.name())) {
+                paises.add(pais);
+            }
+        }
+        return paises;
+    }
+
     public List<Pais> mostrar() {
         return lstPaises;
     }
