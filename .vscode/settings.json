@@ -1,6 +1,8 @@
 {
     "java.project.referencedLibraries": [
-        "lib/**/*.jar",
-        "Libraries/gson-2.13.1.jar"
+        "/workspaces/PA-AYE/Libraries/gson-2.13.1.jar"
+    ],
+    "java.project.sourcePaths": [
+        "."
     ]
 }
