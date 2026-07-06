@@ -11,29 +11,24 @@ import java.util.List;
  * @author ferna
  */
 public class Partido {
+
     private String fecha;
     private int golesLocal;
     private int golesVisitante;
     private int probabilidadVictoriaLocal;
     private int probabilidadVictoriaVisitante;
     
-    private Pais paisLocal;
-    private Pais paisVisitante;
+    private List<Alineacion> alineaciones; //La primera alineacion es del local
     private EstadoPartido estado;
-    private List<Estadistica> partidoEstadisticas;
 
-    public Partido(String fecha, int golesLocal, int golesVisitante, int probabilidadVictoriaLocal,
-            int probabilidadVictoriaVisitante, Pais paisLocal, Pais paisVisitante, EstadoPartido estado,
-            List<Estadistica> partidoEstadisticas) {
+    public Partido(String fecha, int golesLocal, int golesVisitante, int probabilidadVictoriaLocal, int probabilidadVictoriaVisitante, List<Alineacion> alineaciones, EstadoPartido estado) {
         this.fecha = fecha;
         this.golesLocal = golesLocal;
         this.golesVisitante = golesVisitante;
         this.probabilidadVictoriaLocal = probabilidadVictoriaLocal;
         this.probabilidadVictoriaVisitante = probabilidadVictoriaVisitante;
-        this.paisLocal = paisLocal;
-        this.paisVisitante = paisVisitante;
+        this.alineaciones = alineaciones;
         this.estado = estado;
-        this.partidoEstadisticas = partidoEstadisticas;
     }
 
     public String getFecha() {
@@ -76,20 +71,12 @@ public class Partido {
         this.probabilidadVictoriaVisitante = probabilidadVictoriaVisitante;
     }
 
-    public Pais getPaisLocal() {
-        return paisLocal;
+    public List<Alineacion> getAlineaciones() {
+        return alineaciones;
     }
 
-    public void setPaisLocal(Pais paisLocal) {
-        this.paisLocal = paisLocal;
-    }
-
-    public Pais getPaisVisitante() {
-        return paisVisitante;
-    }
-
-    public void setPaisVisitante(Pais paisVisitante) {
-        this.paisVisitante = paisVisitante;
+    public void setAlineaciones(List<Alineacion> alineaciones) {
+        this.alineaciones = alineaciones;
     }
 
     public EstadoPartido getEstado() {
@@ -100,26 +87,8 @@ public class Partido {
         this.estado = estado;
     }
 
-    public List<Estadistica> getPartidoEstadisticas() {
-        return partidoEstadisticas;
-    }
-
-    public void setPartidoEstadisticas(List<Estadistica> partidoEstadisticas) {
-        this.partidoEstadisticas = partidoEstadisticas;
-    }
-
     @Override
     public String toString() {
-        return "Partido{" +
-                "fecha='" + fecha + '\'' +
-                ", golesLocal=" + golesLocal +
-                ", golesVisitante=" + golesVisitante +
-                ", probabilidadVictoriaLocal=" + probabilidadVictoriaLocal +
-                ", probabilidadVictoriaVisitante=" + probabilidadVictoriaVisitante +
-                ", paisLocal=" + paisLocal +
-                ", paisVisitante=" + paisVisitante +
-                ", estado=" + estado +
-                ", partidoEstadisticas=" + partidoEstadisticas +
-                '}';
+        return "Partido{" + "fecha=" + fecha + ", golesLocal=" + golesLocal + ", golesVisitante=" + golesVisitante + ", probabilidadVictoriaLocal=" + probabilidadVictoriaLocal + ", probabilidadVictoriaVisitante=" + probabilidadVictoriaVisitante + ", alineaciones=" + alineaciones + ", estado=" + estado + '}';
     }
 }

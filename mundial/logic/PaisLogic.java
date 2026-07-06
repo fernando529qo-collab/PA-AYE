@@ -79,10 +79,10 @@ public class PaisLogic {
         return model;
     }
     
-    //Muestra de acuerdo a la confederacion 
+    //Muestra de acuerdo a la confederacion pero solo de los registrados
     public static DefaultListModel getDefaultListModelConfederacion(Confederacion confederacion) {
         DefaultListModel model = new DefaultListModel();
-        List<Pais> lista = new ArrayList<>(paisDao.mostrarConfederacion(confederacion));
+        List<Pais> lista = new ArrayList<>(paisDao.mostrarConfederacionRegistrados(confederacion));
         for (int i = 0; i < lista.size(); i++) {
             model.addElement(lista.get(i).toString());
         }

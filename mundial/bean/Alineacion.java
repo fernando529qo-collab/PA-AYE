@@ -12,34 +12,35 @@ import java.util.List;
  */
 public class Alineacion {
     
-    private Partido partido;
     private Pais pais;
-    private List<Jugador> alineacionJugadores;
-    
-    public Alineacion(Partido partido, Pais pais, List<Jugador> alineacionJugadores) {
-        this.partido = partido;
-        this.pais = pais;
-        this.alineacionJugadores = alineacionJugadores;
+    private List<Jugador> jugadoresTitulares;
+
+    public Alineacion() {
     }
 
-    public Partido getPartido() {
-        return partido;
+    public Alineacion(Pais pais, List<Jugador> jugadoresTitulares) {
+        this.pais = pais;
+        this.jugadoresTitulares = jugadoresTitulares;
     }
 
     public Pais getPais() {
         return pais;
     }
 
-    public List<Jugador> getAlineacionJugadores() {
-        return alineacionJugadores;
+    public void setPais(Pais pais) {
+        this.pais = pais;
+    }
+
+    public List<Jugador> getJugadoresTitulares() {
+        return jugadoresTitulares;
+    }
+
+    public void setJugadoresTitulares(List<Jugador> jugadoresTitulares) {
+        this.jugadoresTitulares = jugadoresTitulares;
     }
 
     @Override
     public String toString() {
-        return "Alineacion{" +
-                "partido=" + partido +
-                ", pais=" + pais +
-                ", alineacionJugadores=" + alineacionJugadores +
-                '}';
+        return "Alineacion{" + "pais=" + pais + ", jugadoresTitulares=" + jugadoresTitulares + '}';
     }
 }
