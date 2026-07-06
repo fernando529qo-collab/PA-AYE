@@ -11,16 +11,25 @@ import java.util.List;
  * @author ferna
  */
 public class Alineacion {
-    
+    private Partido partido;
     private Pais pais;
     private List<Jugador> jugadoresTitulares;
 
     public Alineacion() {
     }
 
-    public Alineacion(Pais pais, List<Jugador> jugadoresTitulares) {
+    public Alineacion(Partido partido,Pais pais, List<Jugador> jugadoresTitulares) {
+        this.partido = partido;
         this.pais = pais;
         this.jugadoresTitulares = jugadoresTitulares;
+    }
+
+    public Partido getPartido() {
+        return partido;
+    }
+
+    public void setPartido(Partido partido) {
+        this.partido = partido;
     }
 
     public Pais getPais() {
@@ -41,6 +50,6 @@ public class Alineacion {
 
     @Override
     public String toString() {
-        return "Alineacion{" + "pais=" + pais + ", jugadoresTitulares=" + jugadoresTitulares + '}';
+        return "Alineacion{" + "partido=" + partido + "pais=" + pais + ", jugadoresTitulares=" + jugadoresTitulares + '}';
     }
 }
