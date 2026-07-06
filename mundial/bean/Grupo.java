@@ -15,9 +15,10 @@ public class Grupo {
     private char codigo;
     
     private List<Pais> grupoPaises;
-    private TablaPosicion tabla;
+    // private TablaPosicion tabla;
+    private List<TablaPosicion> tabla;
 
-    public Grupo(char codigo, List<Pais> grupoPaises, TablaPosicion tabla) {
+    public Grupo(char codigo, List<Pais> grupoPaises, List<TablaPosicion> tabla) {
         this.codigo = codigo;
         this.grupoPaises = grupoPaises;
         this.tabla = tabla;
@@ -39,11 +40,11 @@ public class Grupo {
         this.grupoPaises = grupoPaises;
     }
 
-    public TablaPosicion getTabla() {
+    public List<TablaPosicion> getTabla() {
         return tabla;
     }
 
-    public void setTabla(TablaPosicion tabla) {
+    public void setTabla(List<TablaPosicion> tabla) {
         this.tabla = tabla;
     }
 
