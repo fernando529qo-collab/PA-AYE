@@ -198,45 +198,46 @@ public class PartidoDao {
                 mes++;
             }
         }
-        switch (fase) {
+        switch (fase) {             //Ronda eliminatoria y cambia cada 3 dias 
             case DIECISEISAVOS:
                 dia += 3;
-                if (dia == 30) {
+
+                if (dia >= 30) {
                     dia = 1;
                     mes++;
                 }
                 break;
             case OCTAVOS:
                 dia += 3;
-                if (dia == 30) {
+                if (dia >= 30) {
                     dia = 1;
                     mes++;
                 }
                 break;
             case CUARTOS:
                 dia += 3;
-                if (dia == 30) {
+                if (dia >= 30) {
                     dia = 1;
                     mes++;
                 }
                 break;
             case SEMIFINAL:
                 dia += 3;
-                if (dia == 30) {
+                if (dia >= 30) {
                     dia = 1;
                     mes++;
                 }
                 break;
             case TERCERPUESTO:
                 dia += 3;
-                if (dia == 30) {
+                if (dia >= 30) {
                     dia = 1;
                     mes++;
                 }
                 break;
             case FINAL:
                 dia += 3;
-                if (dia == 30) {
+                if (dia >= 30) {
                     dia = 1;
                     mes++;
                 }
