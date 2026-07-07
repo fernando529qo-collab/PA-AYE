@@ -17,17 +17,20 @@ public class TablaPosicion {
     private int golesFavor;
     private int golesContra;
     private int puntos;
-    
+    private int diferenciaGoles;
     private Pais pais;
 
-    public TablaPosicion(int partidosJugados, int partidosGanados, int partidosEmpatados, int partidosPerdidos, int golesFavor, int golesContra, int puntos, Pais pais) {
-        this.partidosJugados = partidosJugados;
-        this.partidosGanados = partidosGanados;
-        this.partidosEmpatados = partidosEmpatados;
-        this.partidosPerdidos = partidosPerdidos;
-        this.golesFavor = golesFavor;
-        this.golesContra = golesContra;
-        this.puntos = puntos;
+    public TablaPosicion() {}
+
+    public TablaPosicion(Pais pais) {
+        this.partidosJugados = 0;
+        this.partidosGanados = 0;
+        this.partidosEmpatados = 0;
+        this.partidosPerdidos = 0;
+        this.golesFavor = 0;
+        this.golesContra = 0;
+        this.puntos = 0;
+        this.diferenciaGoles = 0;
         this.pais = pais;
     }
 
@@ -86,6 +89,13 @@ public class TablaPosicion {
     public void setPuntos(int puntos) {
         this.puntos = puntos;
     }
+    public int getDiferenciaGoles() {
+        return diferenciaGoles;
+    }
+
+    public void setDiferenciaGoles(int diferenciaGoles) {
+        this.diferenciaGoles = diferenciaGoles;
+    }
 
     public Pais getPais() {
         return pais;
@@ -97,6 +107,6 @@ public class TablaPosicion {
 
     @Override
     public String toString() {
-        return "TablaPosicion{" + "partidosJugados=" + partidosJugados + ", partidosGanados=" + partidosGanados + ", partidosEmpatados=" + partidosEmpatados + ", partidosPerdidos=" + partidosPerdidos + ", golesFavor=" + golesFavor + ", golesContra=" + golesContra + ", puntos=" + puntos + ", pais=" + pais + '}';
+        return "TablaPosicion{" + "partidosJugados=" + partidosJugados + ", partidosGanados=" + partidosGanados + ", partidosEmpatados=" + partidosEmpatados + ", partidosPerdidos=" + partidosPerdidos + ", golesFavor=" + golesFavor + ", golesContra=" + golesContra + ", diferenciaGoles= "+ diferenciaGoles + ", puntos=" + puntos + ", pais=" + pais + '}';
     }
 }

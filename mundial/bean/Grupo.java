@@ -4,6 +4,7 @@
  */
 package mundial.bean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,15 +14,14 @@ import java.util.List;
 public class Grupo {
     
     private char codigo;
-    
     private List<Pais> grupoPaises;
     // private TablaPosicion tabla;
     private List<TablaPosicion> tabla;
 
-    public Grupo(char codigo, List<Pais> grupoPaises, List<TablaPosicion> tabla) {
+    public Grupo(char codigo) {
         this.codigo = codigo;
-        this.grupoPaises = grupoPaises;
-        this.tabla = tabla;
+        this.grupoPaises = new ArrayList<>();
+        this.tabla = new ArrayList<>();
     }
 
     public char getCodigo() {
