@@ -11,6 +11,7 @@ import java.util.List;
 import mundial.bean.Partido;
 import mundial.bean.RondaEliminacion;
 import mundial.bean.Bracket;
+import mundial.bean.EstadoPartido;
 import mundial.bean.Pais;
 
 public class PartidoDao {
@@ -97,51 +98,123 @@ public class PartidoDao {
         return lstPartidosEscontrados;
     }
 
-    public void simular(List<Pais> paises) {//Solo simula un partido
-        int punt1 = 0;
-        int punt2 = 0;
-        for (int i = 0; i < 2; i++) {
-            int ranking;
-            int suerte;
-            int estiloJuego = 0;
-            //Puntaje 1
-            ranking = 211 - paises.get(i).getRankingFifa();
-            suerte = (int) (Math.random() * 21);
-            if (paises.get(i).getEstiloJuego().name().equalsIgnoreCase("OFENSIVO")) {
-                estiloJuego = 50;
-            }
-            if (paises.get(i).getEstiloJuego().name().equalsIgnoreCase("DEFENSIVO")) {
-                estiloJuego = 40;
-            }
-            if (paises.get(i).getEstiloJuego().name().equalsIgnoreCase("EQUILIBRADO")) {
-                estiloJuego = 30;
-            }
-            punt1 = ranking + suerte + estiloJuego;
-            //Puntaje 2
-            ranking = 211 - paises.get(i+1).getRankingFifa();
-            suerte = (int) (Math.random() * 21);
-            if (paises.get(i+1).getEstiloJuego().name().equalsIgnoreCase("OFENSIVO")) {
-                estiloJuego = 50;
-            }
-            if (paises.get(i+1).getEstiloJuego().name().equalsIgnoreCase("DEFENSIVO")) {
-                estiloJuego = 40;
-            }
-            if (paises.get(i+1).getEstiloJuego().name().equalsIgnoreCase("EQUILIBRADO")) {
-                estiloJuego = 30;
-            }
-            punt2 = ranking + suerte + estiloJuego;
-        }
-        int suma = punt1 + punt2;
-        //int probabilidadLocal = Math.round((punt1*100)/suma);
-        //int probabilidadVisitante = Math.round((punt2*100)/suma);
+    //Crea o simula un solo partido
+    public Partido simular(List<Pais> paises) throws Exception {
         
-        if (Math.abs(punt1-punt2)<=10) { //Si se queda aqui es empate
-            
-        } else if (punt1>punt2) {   //Si se queda aqui gana el local
-            
-        } else {                    //Gana el visitante
-            
+        int punt1;
+        int punt2;
+
+        int ranking;
+        int suerte;
+        int estiloJuego;
+
+        //Valida que la lista que se le pasa tenga dos paises
+        if (paises == null || paises.size() < 2) {
+            return null;
         }
+        
+        //Puntaje 1 - Local
+        ranking = 211 - paises.get(0).getRankingFifa();
+        suerte = (int) (Math.random() * 21);
+
+        if (paises.get(0).getEstiloJuego().name().equalsIgnoreCase("OFENSIVO")) {
+            estiloJuego = 50;
+        } else if (paises.get(0).getEstiloJuego().name().equalsIgnoreCase("DEFENSIVO")) {
+            estiloJuego = 40;
+        } else {
+            estiloJuego = 30;
+        }
+
+        punt1 = ranking + suerte + estiloJuego;
+
+        //Puntaje 2 - Visitante
+        ranking = 211 - paises.get(1).getRankingFifa();
+        suerte = (int) (Math.random() * 21);
+
+        if (paises.get(1).getEstiloJuego().name().equalsIgnoreCase("OFENSIVO")) {
+            estiloJuego = 50;
+        } else if (paises.get(1).getEstiloJuego().name().equalsIgnoreCase("DEFENSIVO")) {
+            estiloJuego = 40;
+        } else {
+            estiloJuego = 30;
+        }
+
+        punt2 = ranking + suerte + estiloJuego;
+
+        //Probabilidad de victoria
+        int suma = punt1 + punt2;
+
+        int probabilidadLocal = Math.round((punt1 * 100) / suma);
+        int probabilidadVisitante = 100 - probabilidadLocal;
+
+        //Goles
+        int golesLocal;
+        int golesVisitante;
+
+        int diferencia = Math.abs(punt1 - punt2);
+
+        if (diferencia <= 10) { // Empate
+
+            int goles = (int) (Math.random() * 4);
+
+            golesLocal = goles;
+            golesVisitante = goles;
+
+        } else if (punt1 > punt2) { // Gana local
+
+            if (diferencia <= 20) {
+                golesLocal = 1 + (int) (Math.random() * 2); //Min 1 - Max 2
+                golesVisitante = (int) (Math.random() * golesLocal);//Min  - Max 2
+            } else if (diferencia <= 40) {
+                golesLocal = 2 + (int) (Math.random() * 2);
+                golesVisitante = (int) (Math.random() * 2);
+            } else {
+                golesLocal = 4 + (int) (Math.random() * 3);
+                golesVisitante = (int) (Math.random() * 2);
+            }
+
+        } else { // Gana visitante
+
+            if (diferencia <= 20) {
+                golesVisitante = 1 + (int) (Math.random() * 2);
+                golesLocal = (int) (Math.random() * golesVisitante);
+            } else if (diferencia <= 40) {
+                golesVisitante = 2 + (int) (Math.random() * 2);
+                golesLocal = (int) (Math.random() * 2);
+            } else {
+                golesVisitante = 4 + (int) (Math.random() * 3);
+                golesLocal = (int) (Math.random() * 2);
+            }
+
+        }
+
+        //Objeto Partido
+        EstadoPartido es = EstadoPartido.FINALIZADO;
+        String fecha = "1";
+        Partido partido = new Partido(fecha, golesLocal, golesVisitante, probabilidadLocal,
+                probabilidadVisitante, null, es);
+
+        lstPartidos.add(partido);
+        guardar(lstPartidos);
+        return partido;
+    }
+    
+    //Crea o simula varios partidos
+    public List<Partido> simularVarios(List<Pais> paises) throws Exception {
+
+        List<Partido> partidos = new ArrayList<>();
+        
+        if (paises == null || paises.size() < 2) {
+            return null;
+        }
+        
+        for (int i = 0; i < paises.size(); i += 2) {
+            List<Pais> partido = new ArrayList<>();
+            partido.add(paises.get(i));      // Local
+            partido.add(paises.get(i + 1));  // Visitante
+            partidos.add(simular(partido));  //Partido simulado
+        }
+        return partidos;
     }
 
     public List<Partido> mostrar() {
