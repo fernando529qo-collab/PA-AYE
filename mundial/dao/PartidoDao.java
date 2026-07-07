@@ -99,8 +99,8 @@ public class PartidoDao {
     }
 
     //Crea o simula un solo partido
-    public Partido simular(List<Pais> paises) throws Exception {
-        
+    public Partido simular(List<Pais> paises, RondaEliminacion fase) throws Exception {
+
         int punt1;
         int punt2;
 
@@ -112,7 +112,7 @@ public class PartidoDao {
         if (paises == null || paises.size() < 2) {
             return null;
         }
-        
+
         //Puntaje 1 - Local
         ranking = 211 - paises.get(0).getRankingFifa();
         suerte = (int) (Math.random() * 21);
@@ -190,7 +190,59 @@ public class PartidoDao {
 
         //Objeto Partido
         EstadoPartido es = EstadoPartido.FINALIZADO;
-        String fecha = "1";
+        //Se ve lo que es fecha
+        if (lstPartidos.size() <= 72 && lstPartidos.size() % 4 == 0) { //Fase de grupos y cambia cada 4 partidos
+            dia++;
+            if (dia == 30) {
+                dia = 1;
+                mes++;
+            }
+        }
+        switch (fase) {
+            case DIECISEISAVOS:
+                dia += 3;
+                if (dia == 30) {
+                    dia = 1;
+                    mes++;
+                }
+                break;
+            case OCTAVOS:
+                dia += 3;
+                if (dia == 30) {
+                    dia = 1;
+                    mes++;
+                }
+                break;
+            case CUARTOS:
+                dia += 3;
+                if (dia == 30) {
+                    dia = 1;
+                    mes++;
+                }
+                break;
+            case SEMIFINAL:
+                dia += 3;
+                if (dia == 30) {
+                    dia = 1;
+                    mes++;
+                }
+                break;
+            case TERCERPUESTO:
+                dia += 3;
+                if (dia == 30) {
+                    dia = 1;
+                    mes++;
+                }
+                break;
+            case FINAL:
+                dia += 3;
+                if (dia == 30) {
+                    dia = 1;
+                    mes++;
+                }
+                break;
+        }
+        String fecha = dia + "/" + mes + "/2026";
         Partido partido = new Partido(fecha, golesLocal, golesVisitante, probabilidadLocal,
                 probabilidadVisitante, null, es);
 
@@ -198,21 +250,24 @@ public class PartidoDao {
         guardar(lstPartidos);
         return partido;
     }
-    
+    //Se colocan fuera del metodo porque si no en cada ocasion que se llame al metodo dia iniciaria en 10 y mes en 6
+    private int dia = 10;//Inicia en 10 porque en el primer partido va a pasar los filtros y el mundial inicio el 11
+    private int mes = 6;
+
     //Crea o simula varios partidos
-    public List<Partido> simularVarios(List<Pais> paises) throws Exception {
+    public List<Partido> simularVarios(List<Pais> paises, RondaEliminacion ronda) throws Exception {
 
         List<Partido> partidos = new ArrayList<>();
-        
+
         if (paises == null || paises.size() < 2) {
             return null;
         }
-        
+
         for (int i = 0; i < paises.size(); i += 2) {
             List<Pais> partido = new ArrayList<>();
             partido.add(paises.get(i));      // Local
             partido.add(paises.get(i + 1));  // Visitante
-            partidos.add(simular(partido));  //Partido simulado
+            partidos.add(simular(partido, ronda));  //Partido simulado
         }
         return partidos;
     }
