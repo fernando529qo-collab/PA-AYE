@@ -244,7 +244,7 @@ public class PartidoDao {
                 break;
         }
         String fecha = dia + "/" + mes + "/2026";
-        Partido partido = new Partido(fecha, golesLocal, golesVisitante, probabilidadLocal,
+        Partido partido = new Partido(id, fecha, golesLocal, golesVisitante, probabilidadLocal,
                 probabilidadVisitante, null, es);
 
         lstPartidos.add(partido);

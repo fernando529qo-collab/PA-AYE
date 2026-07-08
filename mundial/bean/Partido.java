@@ -11,7 +11,7 @@ import java.util.List;
  * @author ferna
  */
 public class Partido {
-
+    private String id;
     private String fecha;
     private int golesLocal;
     private int golesVisitante;
@@ -21,7 +21,8 @@ public class Partido {
     private List<Alineacion> alineaciones; //La primera alineacion es del local
     private EstadoPartido estado;
 
-    public Partido(String fecha, int golesLocal, int golesVisitante, int probabilidadVictoriaLocal, int probabilidadVictoriaVisitante, List<Alineacion> alineaciones, EstadoPartido estado) {
+    public Partido(String id, String fecha, int golesLocal, int golesVisitante, int probabilidadVictoriaLocal, int probabilidadVictoriaVisitante, List<Alineacion> alineaciones, EstadoPartido estado) {
+        this.id = id;
         this.fecha = fecha;
         this.golesLocal = golesLocal;
         this.golesVisitante = golesVisitante;
@@ -29,6 +30,14 @@ public class Partido {
         this.probabilidadVictoriaVisitante = probabilidadVictoriaVisitante;
         this.alineaciones = alineaciones;
         this.estado = estado;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getFecha() {
@@ -89,6 +98,6 @@ public class Partido {
 
     @Override
     public String toString() {
-        return "Partido{" + "fecha=" + fecha + ", golesLocal=" + golesLocal + ", golesVisitante=" + golesVisitante + ", probabilidadVictoriaLocal=" + probabilidadVictoriaLocal + ", probabilidadVictoriaVisitante=" + probabilidadVictoriaVisitante + ", alineaciones=" + alineaciones + ", estado=" + estado + '}';
+        return "Partido{" + "id= " + id + ", fecha=" + fecha + ", golesLocal=" + golesLocal + ", golesVisitante=" + golesVisitante + ", probabilidadVictoriaLocal=" + probabilidadVictoriaLocal + ", probabilidadVictoriaVisitante=" + probabilidadVictoriaVisitante + ", alineaciones=" + alineaciones + ", estado=" + estado + '}';
     }
 }
