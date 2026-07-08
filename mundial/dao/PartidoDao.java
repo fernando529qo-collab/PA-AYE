@@ -26,7 +26,7 @@ public class PartidoDao {
     }
 
     public boolean registrar(Partido partido) throws Exception {
-        if (buscarPos(partido.getFecha()) == -1) {
+        if (buscarPos(partido.getId()) == -1) {
             lstPartidos.add(partido);
             guardar(lstPartidos);
             return true;
@@ -34,18 +34,18 @@ public class PartidoDao {
         return false;
     }
 
-    public int buscarPos(String fecha) {
+    public int buscarPos(String idPartido) {
         for (int i = 0; i < lstPartidos.size(); i++) {
-            if (lstPartidos.get(i).getFecha().equalsIgnoreCase(fecha)) {
+            if (lstPartidos.get(i).getId().equalsIgnoreCase(idPartido)) {
                 return i;
             }
         }
         return -1;
     }
 
-    public Partido buscarObj(String fecha) {
+    public Partido buscarObj(String idPartido) {
         for (int i = 0; i < lstPartidos.size(); i++) {
-            if (lstPartidos.get(i).getFecha().equalsIgnoreCase(fecha)) {
+            if (lstPartidos.get(i).getId().equalsIgnoreCase(idPartido)) {
                 return lstPartidos.get(i);
             }
         }

@@ -2,10 +2,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Dao;
+package mundial.dao;
 
-import bean.Grupo;
-import bean.TablaPosicion;
+import mundial.bean.Alineacion;
+import mundial.bean.EstadoPartido;
+import mundial.bean.Grupo;
+import mundial.bean.Pais;
+import mundial.bean.Partido;
+import mundial.bean.TablaPosicion;
 import java.util.ArrayList;
 
 /**
@@ -186,7 +190,7 @@ public class GrupoDao {
                 for (int k = j + 1; k < paises.size(); k++) {
                     Pais local = paises.get(j);
                     Pais visitante = paises.get(k);
-                    Partido partido = new Partido("", 0, 0, 0, 0, new ArrayList<>(), EstadoPartido.PENDIENTE);
+                    Partido partido = new Partido("", "", 0, 0, 0, 0, new ArrayList<>(), EstadoPartido.PENDIENTE);
                     Alineacion alineacionLocal = new Alineacion(partido, local);
                     Alineacion alineacionVisitante = new Alineacion(partido, visitante);
                     partido.getAlineaciones().add(alineacionLocal);

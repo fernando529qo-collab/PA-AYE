@@ -2,11 +2,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Logic;
+package mundial.logic;
 
-import Dao.TablaPosicionDao;
-import bean.Grupo;
-import bean.TablaPosicion;
+import mundial.dao.TablaPosicionDao;
+import mundial.bean.Grupo;
+import mundial.bean.Pais;
+import mundial.bean.TablaPosicion;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 

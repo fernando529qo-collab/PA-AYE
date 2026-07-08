@@ -34,11 +34,11 @@ public class Grupo {
         return codigo;
     }
 
-    public List getEncuentros() {
+    public List<Partido> getEncuentros() {
         return encuentros;
     }
 
-    public void setEncuentros(List encuentros) {
+    public void setEncuentros(List<Partido> encuentros) {
         this.encuentros = encuentros;
     }
 
