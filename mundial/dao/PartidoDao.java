@@ -11,8 +11,6 @@ import java.util.List;
 import mundial.bean.Partido;
 import mundial.bean.RondaEliminacion;
 import mundial.bean.Bracket;
-import mundial.bean.EstadoPartido;
-import mundial.bean.Pais;
 
 public class PartidoDao {
     // CRUD estándar, más buscarPorGrupo(), buscarPorFase(), guardarResultado()
@@ -132,4 +130,77 @@ public class PartidoDao {
             throw e;
         }
     }
+
+    //metodo para generar probabilidad
+public Partido simular(List<Pais> paises, String fecha) {
+    int punt1 = 0;
+    int punt2 = 0;
+    int ranking;
+    int suerte;
+    int estiloJuego = 0;
+    int probabilidadLocal;
+    int probabilidadVisitante;
+    //PUNTAJE LOCAL (Pais 0)
+    ranking = 211 - paises.get(0).getRankingFifa();
+    suerte = (int) (Math.random() * 21);
+    if (paises.get(0).getEstiloJuego().name().equalsIgnoreCase("OFENSIVO")) {
+        estiloJuego = 50;
+    }
+    if (paises.get(0).getEstiloJuego().name().equalsIgnoreCase("DEFENSIVO")) {
+        estiloJuego = 40;
+    }
+    if (paises.get(0).getEstiloJuego().name().equalsIgnoreCase("EQUILIBRADO")) {
+        estiloJuego = 30;
+    }
+    punt1 = ranking + suerte + estiloJuego;
+
+    // PUNTAJE VISITANTE (Pais 1)
+    ranking = 211 - paises.get(1).getRankingFifa();
+    suerte = (int) (Math.random() * 21);
+    if (paises.get(1).getEstiloJuego().name().equalsIgnoreCase("OFENSIVO")) {
+        estiloJuego = 50;
+    }
+    if (paises.get(1).getEstiloJuego().name().equalsIgnoreCase("DEFENSIVO")) {
+        estiloJuego = 40;
+    }
+    if (paises.get(1).getEstiloJuego().name().equalsIgnoreCase("EQUILIBRADO")) {
+        estiloJuego = 30;
+    }
+    punt2 = ranking + suerte + estiloJuego;
+
+    //PROBABILIDADES
+    int suma = punt1 + punt2;
+    probabilidadLocal = Math.round((punt1 * 100.0f) / suma);
+    probabilidadVisitante = 100 - probabilidadLocal;
+
+    //GENERACION DE GOLES A PARTIR DE LA PROBABILIDAD
+    int[] goles = generarGoles(probabilidadLocal, probabilidadVisitante);
+    int golesLocal = goles[0];
+    int golesVisitante = goles[1];
+
+    // --- CREACION DEL OBJETO PARTIDO ---
+    List<Pais> partidoPais = new ArrayList<>();
+    partidoPais.add(paises.get(0)); //local
+    partidoPais.add(paises.get(1)); //visitante
+
+    Partido partidoSimulado = new Partido(
+            fecha,
+            golesLocal,
+            golesVisitante,
+            probabilidadLocal,
+            probabilidadVisitante,
+            partidoPais,
+            EstadoPartido.FINALIZADO,
+            new ArrayList<Estadistica>()
+    );
+
+    try {
+        registrar(partidoSimulado);
+        System.out.println("Partido simulado y guardado con exito.");
+    } catch (Exception e) {
+        System.err.println("Error al guardar el partido simulado: " + e.getMessage());
+    }
+
+    return partidoSimulado;
+}
 }
