@@ -122,7 +122,7 @@ public class TablaPosicionDao {
                 return true;
             }
             if (equipo2.getGolesFavor() == equipo1.getGolesFavor()) {
-                if (equipo2.getPais().getrankingFifa() < equipo1.getPais().getrankingFifa()) {
+                if (equipo2.getPais().getRankingFifa() < equipo1.getPais().getRankingFifa()) {
                     return true;
                 }
             }
