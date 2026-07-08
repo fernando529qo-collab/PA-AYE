@@ -69,33 +69,6 @@ public class PartidoDao {
         return false;
     }
 
-    public List<Partido> buscarPorGrupo(char codigo) {
-        int pos = 0;
-        List<Partido> lstPartidosEncotrados = new ArrayList<>();
-        for (Partido p : lstPartidos) {
-            if (codigo != 0 && codigo == p.getPaisLocal().getGrupo().getCodigo()) {
-                lstPartidosEncotrados.add(lstPartidos.get(pos));
-            }
-            pos++;
-        }
-        return lstPartidosEncotrados;
-    }
-
-    public List<Partido> buscarPorFase(RondaEliminacion rondaEliminacion) {
-        int pos = 0;
-        List<Partido> lstPartidosEscontrados = new ArrayList<>();
-        Bracket fase = new Bracket();
-        for (Partido p : lstPartidosEscontrados) {
-            if (fase.getBracketPartidos().get(pos) == p) {
-                if (fase.getRonda().compareTo(rondaEliminacion) == 1) {
-                    lstPartidosEscontrados.add(p);
-                }
-            }
-            pos++;
-        }
-        return lstPartidosEscontrados;
-    }
-
     public List<Partido> mostrar() {
         return lstPartidos;
     }
