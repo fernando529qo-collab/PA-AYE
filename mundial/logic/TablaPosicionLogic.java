@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
  * @author ACER
  */
 public class TablaPosicionLogic {
-
+// hello 
     //Crea la tabla de posiciones
     public static String crearTablaPosiciones(Grupo grupo) {
         try {
