@@ -145,9 +145,9 @@ public class EstadisticaLogic {
     private static int calcularFaltas(int diferenciaGoles) {
         int base = 10 + (int) (Math.random() * 6);
         if (diferenciaGoles < 0) {
-            base += Math.min(5, Math.abs(diferenciaGoles) * 2); // va perdiendo -> mas faltas
+            base += Math.min(5, Math.abs(diferenciaGoles) * 2); // va perdiendo, mas faltas
         } else if (diferenciaGoles > 0) {
-            base -= Math.min(3, diferenciaGoles); // va ganando -> menos faltas
+            base -= Math.min(3, diferenciaGoles); // va ganando, menos faltas
         }
         if (base < 4) {
             base = 4; // piso minimo
