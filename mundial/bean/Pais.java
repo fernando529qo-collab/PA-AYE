@@ -20,7 +20,6 @@ public class Pais {
     private int ataque;
     private int defensa;
     private int factorSuerte;
-   
     private Grupo grupo;
     private List<Jugador> paisJugadores;
     private Confederacion confederacion;

@@ -334,5 +334,34 @@ public class GrupoDao {
         clasificados.addAll(obtenerSegundosLugares(grupos));
         clasificados.addAll(obtenerMejoresTerceros(grupos));
         return clasificados;
+    }
+    
+    //Realiza el sorteo de los grupos
+    public static void sortearGrupos(ArrayList<Grupo> grupos, ArrayList<Pais> paises) {
+        limpiarGrupos(grupos);
+        ArrayList<ArrayList<Pais>> bombos = crearBombos(paises);
+        mezclarBombos(bombos);
+        colocarAnfitrion(grupos, bombos);
+
+        for (int i = 0; i < bombos.size(); i++) {
+            ArrayList<Pais> bombo = bombos.get(i);
+            for (int j = 0; j < grupos.size(); j++) {
+                Grupo grupo = grupos.get(j);
+                if (grupo.getGrupoPaises().size() > i) {
+                    continue;
+                }
+                for (int k = 0; k < bombo.size(); k++) {
+                    Pais pais = bombo.get(k);
+                    if (validarConfederacion(grupo, pais)) {
+                        grupo.getGrupoPaises().add(pais);
+                        pais.setGrupo(grupo);
+                        bombo.remove(k);
+                        break;
+                    }
+                }
+            }
+        }
+        crearTablaGrupo(grupos);
+        generarEncuentrosGrupos(grupos);
     } 
 }

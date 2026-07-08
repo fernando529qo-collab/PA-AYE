@@ -1,7 +1,9 @@
 package mundial.logic;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import mundial.bean.EstadoPartido;
 import mundial.bean.Pais;
 import mundial.bean.Partido;
 import mundial.bean.RondaEliminacion;

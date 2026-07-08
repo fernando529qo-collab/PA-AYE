@@ -2,21 +2,23 @@ package mundial.logic;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import mundial.bean.Estadistica;
 import mundial.bean.Pais;
 import mundial.bean.Partido;
 import mundial.dao.PartidoDao;
 
 public class EstadisticaLogic {
+
     //met: recibe al partido y le agrega las estadísticas
     public static Partido simularConEstadisticas(List<Pais> paises, String fecha) {
         Partido partido = PartidoLogic.simular(paises, fecha);
-        return procesarEstadisticas(partido);
+        String mensajeGuardado = procesarEstadisticas(partido);
+        partido.setMensaje(mensajeGuardado);
+        return partido;
     }
 
-    //met: toma un partido simulado y genera estadisticas y guarda
-    public static Partido procesarEstadisticas(Partido partido) {
+    //met: toma un partido simulado, genera estadisticas, las guarda
+    public static String procesarEstadisticas(Partido partido) {
         int golesLocal = partido.getGolesLocal();
         int golesVisitante = partido.getGolesVisitante();
         int probabilidadLocal = partido.getProbabilidadLocal();
@@ -25,22 +27,22 @@ public class EstadisticaLogic {
                 golesLocal, golesVisitante, probabilidadLocal, probabilidadVisitante);
 
         partido.setPartidoEstadisticas(estadisticas);
+
         try {
             // Instancia nueva: lee el JSON ya actualizado por PartidoLogic.simular()
             PartidoDao partidoDao = new PartidoDao();
             boolean actualizado = partidoDao.actualizar(partido);
             if (actualizado) {
-                System.out.println("Estadisticas generadas y guardadas con exito.");
+                return "Estadisticas generadas y guardadas con exito.";
             } else {
-                System.err.println("No se encontro el partido para actualizar sus estadisticas.");
+                return "No se encontro el partido para actualizar sus estadisticas.";
             }
         } catch (Exception e) {
-            System.err.println("Error al guardar las estadisticas: " + e.getMessage());
+            return "Error al guardar las estadisticas: " + e.getMessage();
         }
-        return partido;
     }
 
-    //met: genera estadisticas a partir de las de partido 
+    //met: genera estadisticas a partir de las de partido
     public static List<Estadistica> generarEstadisticas(int golesLocal, int golesVisitante, int probabilidadLocal, int probabilidadVisitante) {
         // La posesion del local se calcula a partir de su probabilidad de ganar
         int posesionLocal = calcularPosesion(probabilidadLocal);
@@ -57,8 +59,7 @@ public class EstadisticaLogic {
         return estadisticas;
     }
 
-    // Calcula la posesion de un equipo a partir de su probabilidad de victoria.
-    // A la probabilidad se le suma una variación aleatoria entre -5 a +5, luego se limita entre 30 y 70
+    // Calcula la posesion de un equipo a partir de su probabilidad de victoria a la probabilidad se le suma una variación aleatoria entre -5 a +5, luego se limita entre 30 y 70
     private static int calcularPosesion(int probabilidad) {
         int variacion = (int) (Math.random() * 11) - 5; // numero aleatorio entre -5 y +5
         int posesion = probabilidad + variacion;
