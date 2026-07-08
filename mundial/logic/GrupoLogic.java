@@ -11,7 +11,6 @@ import mundial.bean.Partido;
 import mundial.bean.TablaPosicion;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -136,9 +135,9 @@ public class GrupoLogic {
             if (paises.isEmpty()) {
                 return "No existen países registrados.";
             }
+            //sortearGrupos ya arma la tabla de posiciones y genera los
+            //encuentros internamente, no hace falta repetirlo aquí
             GrupoDao.sortearGrupos(grupos, paises);
-            GrupoDao.crearTablaGrupo(grupos);
-            GrupoDao.generarEncuentrosGrupos(grupos);
             return "La fase de grupos fue inicializada correctamente.";
         } catch (Exception e) {
             return e.getMessage();
