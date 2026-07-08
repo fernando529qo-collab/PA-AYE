@@ -21,12 +21,12 @@ public class AdministradorFifaDao {
         administradorFifa = new AdministradorFifa(id, nombre, contraseña);
     }
 
-    public int validarInicio(AdministradorFifa admin) { // Bota 1 si coincide y -1 si no
-        if (this.administradorFifa.getNombre().equalsIgnoreCase(admin.getNombre()) 
-                && this.administradorFifa.getContraseña().equalsIgnoreCase(admin.getContraseña())) {
-            return 1;
-        }
-        return -1;
+    public AdministradorFifa mostrar() {
+        return administradorFifa;
+    }
+
+    public void setAdministradorFifa(AdministradorFifa administradorFifa) {
+        this.administradorFifa = administradorFifa;
     }
     
 }

@@ -47,29 +47,14 @@ public class DirectorFederacionDao {
         }
         return null;
     }
-
-    public void crearCuentas(List<Pais> paisesCrear) throws Exception {  //Recibe a los paises registrados para 
-        for (int i = 0; i < 48; i++) {                  //crear las cuentas de Director Federacion
-            String id = (i + 1) + "";
-            String nombre = paisesCrear.get(i).getNombre().toUpperCase(); //Converte el nombre del pais en mayuscula
-            String contraseña = paisesCrear.get(i).getNombre().toLowerCase() + paisesCrear.get(i).getRankingFifa();
-            //La contraseña es el nombre del pais en minuscula mas el numero de rankingFifa
-            Pais pais = paisesCrear.get(i);
-            boolean habilitado = true;
-            DirectorFederacion director = new DirectorFederacion(id, nombre, contraseña, habilitado, pais);
-            this.lstDirectoresFederaciones.add(director);
+    
+    public boolean registrar(DirectorFederacion director) throws Exception {
+        if (buscarPos(director.getId()) == -1) {
+            lstDirectoresFederaciones.add(director);
+            guardar(lstDirectoresFederaciones);
+            return true;
         }
-        guardar(this.lstDirectoresFederaciones);
-    }
-
-    public int validarInicio(DirectorFederacion directorFederacion) { // Bota la posicion si coincide y -1 si no
-        for (int i = 0; i < this.lstDirectoresFederaciones.size(); i++) {
-            if (this.lstDirectoresFederaciones.get(i).getNombre().equalsIgnoreCase(directorFederacion.getNombre())
-                    && this.lstDirectoresFederaciones.get(i).getContraseña().equalsIgnoreCase(directorFederacion.getContraseña())) {
-                return i;
-            }
-        }
-        return -1;
+        return false;
     }
 
     public List<DirectorFederacion> mostrar() {
