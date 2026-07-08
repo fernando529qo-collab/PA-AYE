@@ -1,108 +1,188 @@
 package mundial.logic;
- 
-import java.util.ArrayList;
-import java.util.List;
-import mundial.bean.EstadoPartido;
-import mundial.bean.Estadistica;
+
+import mundial.dao.GrupoDao;
+import mundial.bean.Grupo;
 import mundial.bean.Pais;
 import mundial.bean.Partido;
-import mundial.dao.PartidoDao;
+import mundial.bean.TablaPosicion;
+import java.util.ArrayList;
+import java.util.List;
 
-public class PartidoLogic {
-    private static PartidoDao partidoDao = new PartidoDao();
+/**
+ *
+ * @author ACER
+ */
+public class GrupoLogic {
 
-
-    public static Partido simular(List<Pais> paises, String fecha) {
-        int punt1 = 0;
-        int punt2 = 0;
-        int ranking;
-        int suerte;
-        int estiloJuego = 0;
-        int probabilidadLocal;
-        int probabilidadVisitante;
-
-        //PUNTAJE LOCAL (Pais 0)
-        ranking = 211 - paises.get(0).getRankingFifa();
-        suerte = (int) (Math.random() * 21);
-        if (paises.get(0).getEstiloJuego().name().equalsIgnoreCase("OFENSIVO")) {
-            estiloJuego = 50;
-        }
-        if (paises.get(0).getEstiloJuego().name().equalsIgnoreCase("DEFENSIVO")) {
-            estiloJuego = 40;
-        }
-        if (paises.get(0).getEstiloJuego().name().equalsIgnoreCase("EQUILIBRADO")) {
-            estiloJuego = 30;
-        }
-        punt1 = ranking + suerte + estiloJuego;
- 
-        //PUNTAJE VISITANTE (Pais 1)
-        ranking = 211 - paises.get(1).getRankingFifa();
-        suerte = (int) (Math.random() * 21);
-        if (paises.get(1).getEstiloJuego().name().equalsIgnoreCase("OFENSIVO")) {
-            estiloJuego = 50;
-        }
-        if (paises.get(1).getEstiloJuego().name().equalsIgnoreCase("DEFENSIVO")) {
-            estiloJuego = 40;
-        }
-        if (paises.get(1).getEstiloJuego().name().equalsIgnoreCase("EQUILIBRADO")) {
-            estiloJuego = 30;
-        }
-        punt2 = ranking + suerte + estiloJuego;
- 
-        //CALCULO DE PROBABILIDADES
-        int suma = punt1 + punt2;
-        probabilidadLocal = Math.round((punt1 * 100.0f) / suma);
-        //El visitante = 100 - local, para GARANTIZAR que ambos sumen exactamente 100
-        probabilidadVisitante = 100 - probabilidadLocal;
- 
-        //GENERACION DE GOLES A PARTIR DE LA PROBABILIDAD
-        int[] goles = generarGoles(probabilidadLocal, probabilidadVisitante);
-        int golesLocal = goles[0];
-        int golesVisitante = goles[1];
- 
-        // --- CREACION DEL OBJETO PARTIDO ---
-        //Partido no tiene constructor vacio ni setPaisLocal/setPaisVisitante: los dos
-        //paises van en una lista, el primero SIEMPRE es el local.
-        List<Pais> partidoPais = new ArrayList<>();
-        partidoPais.add(paises.get(0)); //local
-        partidoPais.add(paises.get(1)); //visitante
- 
-        Partido partidoSimulado = new Partido(fecha, golesLocal,golesVisitante, probabilidadLocal,probabilidadVisitante,partidoPais,EstadoPartido.FINALIZADO, new ArrayList<>());
-         try {
-            partidoDao.registrar(partidoSimulado);
-            System.out.println("Partido simulado y guardado con exito.");
+    //Registra un grupo
+    public static String registrarGrupo(ArrayList<Grupo> grupos, Grupo grupo) {
+        try {
+            if (grupo == null) {
+                return "Debe ingresar un grupo.";
+            }
+            if (GrupoDao.buscarGrupo(grupos, grupo.getCodigo()) != null) {
+                return "El grupo ya existe.";
+            }
+            GrupoDao.registrarGrupo(grupos, grupo);
+            return "Grupo registrado correctamente.";
         } catch (Exception e) {
-            System.err.println("Error al guardar el partido simulado: " + e.getMessage());
+            return e.getMessage();
         }
- 
-        return partidoSimulado;
     }
- 
-   
-    public static int[] generarGoles(int probabilidadLocal, int probabilidadVisitante) {
-        int golesMaximos = 5;
-        double promedioLocal = (probabilidadLocal / 100.0) * golesMaximos;
-        double promedioVisitante = (probabilidadVisitante / 100.0) * golesMaximos;
-        int golesLocal = generarGolesEquipo(promedioLocal, golesMaximos);
-        int golesVisitante = generarGolesEquipo(promedioVisitante, golesMaximos);
-        return new int[]{golesLocal, golesVisitante};
-    }
- 
-    //Convierte un promedio de goles esperado en un numero real de goles,
-    //agregando variacion de -1, 0 o +1 gol y respetando el rango [0, golesMaximos]
-    private static int generarGolesEquipo(double promedioEsperado, int golesMaximos) {
-        int variacion = (int) (Math.random() * 3) - 1; // -1, 0 o 1
-        int goles = (int) Math.round(promedioEsperado) + variacion;
-        if (goles < 0) {
-            goles = 0;
+
+    //Actualiza un grupo
+    public static String actualizarGrupo(ArrayList<Grupo> grupos, Grupo grupo) {
+        try {
+            if (grupo == null) {
+                return "Debe ingresar un grupo.";
+            }
+            if (GrupoDao.buscarGrupo(grupos, grupo.getCodigo()) == null) {
+                return "El grupo no existe.";
+            }
+            GrupoDao.actualizarGrupo(grupos, grupo);
+            return "Grupo actualizado correctamente.";
+        } catch (Exception e) {
+            return e.getMessage();
         }
-        if (goles > golesMaximos) {
-            goles = golesMaximos;
+    }
+
+    //Elimina un grupo
+    public static String eliminarGrupo(ArrayList<Grupo> grupos, char codigo) {
+        try {
+            if (GrupoDao.buscarGrupo(grupos, codigo) == null) {
+                return "El grupo no existe.";
+            }
+            GrupoDao.eliminarGrupo(grupos, codigo);
+            return "Grupo eliminado correctamente.";
+        } catch (Exception e) {
+            return e.getMessage();
         }
-        return goles;
     }
- 
-    public static List<Partido> listar() {
-        return partidoDao.mostrar();
+
+    //Lista todos los grupos
+    public static ArrayList<Grupo> listarGrupos(ArrayList<Grupo> grupos) {
+        try {
+            return GrupoDao.mostrarGrupos(grupos);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
     }
+    //Realiza el sorteo de los grupos
+
+    public static String sortearGrupos(ArrayList<Grupo> grupos, ArrayList<Pais> paises) {
+        try {
+            if (grupos.isEmpty()) {
+                return "No existen grupos registrados.";
+            }
+            if (paises.isEmpty()) {
+                return "No existen países registrados.";
+            }
+            GrupoDao.sortearGrupos(grupos, paises);
+            return "Sorteo realizado correctamente.";
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    //Crea la tabla de posiciones de todos los grupos
+    public static String crearTablaGrupo(ArrayList<Grupo> grupos) {
+        try {
+            if (grupos.isEmpty()) {
+                return "No existen grupos registrados.";
+            }
+            GrupoDao.crearTablaGrupo(grupos);
+            return "Tabla de posiciones creada correctamente.";
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    //Genera los encuentros de todos los grupos
+    public static String generarEncuentrosGrupos(ArrayList<Grupo> grupos) {
+        try {
+            if (grupos.isEmpty()) {
+                return "No existen grupos registrados.";
+            }
+            GrupoDao.generarEncuentrosGrupos(grupos);
+            return "Encuentros generados correctamente.";
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    //Lista los encuentros de un grupo
+    public static ArrayList<Partido> listarEncuentrosGrupo(Grupo grupo) {
+        try {
+            if (grupo == null) {
+                return new ArrayList<>();
+            }
+            return GrupoDao.mostrarEncuentrosGrupo(grupo);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    //Inicializa toda la fase de grupos
+    public static String inicializarFaseGrupos(ArrayList<Grupo> grupos, ArrayList<Pais> paises) {
+        try {
+            if (grupos.isEmpty()) {
+                return "No existen grupos registrados.";
+            }
+            if (paises.isEmpty()) {
+                return "No existen países registrados.";
+            }
+            //sortearGrupos y arma la tabla de posiciones y genera los
+            //encuentros internamente, no hace falta repetirlo aquí
+            GrupoDao.sortearGrupos(grupos, paises);
+            return "La fase de grupos fue inicializada correctamente.";
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    //Obtiene los primeros lugares
+    public static ArrayList<Pais> obtenerPrimerosLugares(ArrayList<Grupo> grupos) {
+        try {
+            return GrupoDao.obtenerPrimerosLugares(grupos);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    //Obtiene los segundos lugares
+    public static ArrayList<Pais> obtenerSegundosLugares(ArrayList<Grupo> grupos) {
+        try {
+            return GrupoDao.obtenerSegundosLugares(grupos);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    //Obtiene los terceros lugares
+    public static ArrayList<Pais> obtenerTercerosLugares(ArrayList<Grupo> grupos) {
+        try {
+            return GrupoDao.obtenerTercerosLugares(grupos);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    //Obtiene los mejores terceros
+    public static ArrayList<Pais> obtenerMejoresTerceros(ArrayList<Grupo> grupos) {
+        try {
+            return GrupoDao.obtenerMejoresTerceros(grupos);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    //Obtiene los 32 clasificados
+    public static ArrayList<Pais> obtenerClasificadosMundial(ArrayList<Grupo> grupos) {
+        try {
+            return GrupoDao.obtenerClasificadosMundial(grupos);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
 }
