@@ -22,15 +22,22 @@ import mundial.bean.Pais;
  */
 public class PaisDao {   
     
-    private List<Pais> lstPaises;
+    private List<Pais> lstPaises; //Paises Registrados
+
+    private List<Pais> lstPaisesTodos; //Todos los paises
 
     private Gson gson = new Gson();
     private File file = new File("PAISES.json");
-    
+
+    private Gson gson1 = new Gson();
+    private File file1 = new File("TODOS_PAISES.json");
+
     public PaisDao() {
         this.lstPaises = leer();
+        this.lstPaisesTodos = leerTodos();
     }
-    
+
+    //Tanto "buscarPos" como "buscarObj" utilizan el id para buscar
     public int buscarPos(String id) {      //Retorna la posicion (En caso de que no la encuentre retorna -1)
         for (int i = 0; i < this.lstPaises.size(); i++) {
             if (this.lstPaises.get(i).getId().equalsIgnoreCase(id)) {
@@ -39,7 +46,7 @@ public class PaisDao {
         }
         return -1;
     }
-    
+
     public Pais buscarObj(String id) {   //Retorna el Pais (En caso de que no la encuentre retorna null)
         for (int i = 0; i < this.lstPaises.size(); i++) {
             if (this.lstPaises.get(i).getId().equalsIgnoreCase(id)) {
@@ -49,24 +56,13 @@ public class PaisDao {
         return null;
     }
 
-    //Buscar por confederacion esta utilizando la clase Confederacion
-    public int buscarConf(Confederacion confederacion) {      //Retorna la posicion (En caso de que no la encuentre retorna -1)
-        for (int i = 0; i < this.lstPaises.size(); i++) {
-            if (this.lstPaises.get(i).getConfederacion().name().equalsIgnoreCase(confederacion.name())) {
-                return i;
+    public void registrarConfederacion(List<Pais> paises) throws Exception {
+        for (Pais p : paises) {
+            if (buscarPos(p.getId()) == -1) {
+                this.lstPaises.add(p);
             }
         }
-        return -1;
-    }
-    
-    //Buscar por confederacion esta utilizando la clase Confederacion
-    public Pais buscarConfederacion(Confederacion confederacion) {  //Retorna el pais (En caso de que no la encuentre retorna -1)
-        for (int i = 0; i < this.lstPaises.size(); i++) {
-            if (this.lstPaises.get(i).getConfederacion().name().equalsIgnoreCase(confederacion.name())) {
-                return this.lstPaises.get(i);
-            }
-        }
-        return null;
+        guardar(this.lstPaises);
     }
 
     public void registrar(Pais p) throws Exception {
@@ -75,14 +71,14 @@ public class PaisDao {
         }
         guardar(this.lstPaises);
     }
-    
+
     public void actualizar(Pais p) throws Exception {
         if (buscarPos(p.getNombre()) != -1) {
             this.lstPaises.set(buscarPos(p.getId()), p);
         }
         guardar(this.lstPaises);
     }
-    
+
     public void eliminar(Pais p) throws Exception {
         int pos = buscarPos(p.getId());
         if (pos != -1) {
@@ -91,9 +87,19 @@ public class PaisDao {
         guardar(this.lstPaises);
     }
 
-    public List<Pais> mostrarConfederacion(Confederacion c) {
+    public List<Pais> mostrarConfederacionRegistrados(Confederacion c) { //Muestra a los paises de una confederacion
         List<Pais> paises = new ArrayList<>();
         for (Pais pais : this.lstPaises) {
+            if (pais.getConfederacion().name().equalsIgnoreCase(c.name())) {
+                paises.add(pais);
+            }
+        }
+        return paises;
+    }
+
+    public List<Pais> mostrarConfederacionTodos(Confederacion c) { //Muestra a los paises de una confederacion
+        List<Pais> paises = new ArrayList<>();
+        for (Pais pais : this.lstPaisesTodos) {
             if (pais.getConfederacion().name().equalsIgnoreCase(c.name())) {
                 paises.add(pais);
             }
@@ -108,7 +114,7 @@ public class PaisDao {
     public void setLstPaises(List<Pais> lstPaises) {
         this.lstPaises = lstPaises;
     }
-    
+
     public List<Pais> leer() {
         try {
             List<Pais> paises;
@@ -134,5 +140,36 @@ public class PaisDao {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    public List<Pais> leerTodos() {
+        try {
+            List<Pais> paises;
+            if (!file1.exists()) {
+                return new ArrayList<>();
+            }
+            try (BufferedReader br = new BufferedReader(new FileReader(file1))) {
+                paises = gson1.fromJson(br.readLine(), new TypeToken<ArrayList<Pais>>() {
+                }.getType());
+            }
+            if (paises == null) {
+                paises = new ArrayList<>();
+            }
+            return paises;
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public void guardarTodos(List<Pais> lista) throws Exception {
+        try (FileWriter fw = new FileWriter(file1)) {
+            gson1.toJson(lista, fw);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public List<Pais> mostrarTodos() {
+        return lstPaisesTodos;
     }
 }

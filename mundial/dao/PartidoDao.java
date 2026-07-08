@@ -11,45 +11,40 @@ import java.util.List;
 import mundial.bean.Partido;
 import mundial.bean.RondaEliminacion;
 import mundial.bean.Bracket;
-import mundial.bean.EstadoPartido;
-import mundial.bean.Estadistica;
 
 public class PartidoDao {
     // CRUD estándar, más buscarPorGrupo(), buscarPorFase(), guardarResultado()
-    private List<Partido> lstpartidos;
+    private List<Partido> lstPartidos;
+
     private Gson gson = new Gson();
     private File file = new File("PARTIDOS.json");
 
     public PartidoDao() {
-        lstpartidos = leer();
+        lstPartidos = leer();
     }
 
     public boolean registrar(Partido partido) throws Exception {
-        if (buscarPos(partido.getFecha()) == -1) {
-            lstpartidos.add(partido);
-            guardar(lstpartidos);
+        if (buscarPos(partido.getId()) == -1) {
+            lstPartidos.add(partido);
+            guardar(lstPartidos);
             return true;
         }
         return false;
     }
 
-    public List<Partido> mostrar() {
-        return lstpartidos;
-    }
-
-    public int buscarPos(String fecha) {
-        for (int i = 0; i < lstpartidos.size(); i++) {
-            if (lstpartidos.get(i).getFecha().equalsIgnoreCase(fecha)) {
+    public int buscarPos(String idPartido) {
+        for (int i = 0; i < lstPartidos.size(); i++) {
+            if (lstPartidos.get(i).getId().equalsIgnoreCase(idPartido)) {
                 return i;
             }
         }
         return -1;
     }
 
-    public Partido buscarObj(String fecha) {
-        for (int i = 0; i < lstpartidos.size(); i++) {
-            if (lstpartidos.get(i).getFecha().equalsIgnoreCase(fecha)) {
-                return lstpartidos.get(i);
+    public Partido buscarObj(String idPartido) {
+        for (int i = 0; i < lstPartidos.size(); i++) {
+            if (lstPartidos.get(i).getId().equalsIgnoreCase(idPartido)) {
+                return lstPartidos.get(i);
             }
         }
         return null;
@@ -57,8 +52,8 @@ public class PartidoDao {
 
     public boolean actualizar(Partido partido) throws Exception {
         if (buscarPos(partido.getFecha()) != -1) {
-            lstpartidos.set(buscarPos(partido.getFecha()), partido);
-            guardar(lstpartidos);
+            lstPartidos.set(buscarPos(partido.getFecha()), partido);
+            guardar(lstPartidos);
             return true;
         }
         return false;
@@ -67,8 +62,8 @@ public class PartidoDao {
     public boolean eliminar(Partido partido) throws Exception {
         int pos = buscarPos(partido.getFecha());
         if (pos != -1) {
-            lstpartidos.remove(pos);
-            guardar(lstpartidos);
+            lstPartidos.remove(pos);
+            guardar(lstPartidos);
             return true;
         }
         return false;
@@ -77,9 +72,9 @@ public class PartidoDao {
     public List<Partido> buscarPorGrupo(char codigo) {
         int pos = 0;
         List<Partido> lstPartidosEncotrados = new ArrayList<>();
-        for (Partido p : lstpartidos) {
+        for (Partido p : lstPartidos) {
             if (codigo != 0 && codigo == p.getPaisLocal().getGrupo().getCodigo()) {
-                lstPartidosEncotrados.add(lstpartidos.get(pos));
+                lstPartidosEncotrados.add(lstPartidos.get(pos));
             }
             pos++;
         }
@@ -101,6 +96,14 @@ public class PartidoDao {
         return lstPartidosEscontrados;
     }
 
+    public List<Partido> mostrar() {
+        return lstPartidos;
+    }
+
+    public void setLstPartidos(List<Partido> lstPartidos) {
+        this.lstPartidos = lstPartidos;
+    }
+
     public List<Partido> leer() {
         try {
             List<Partido> partidos;
@@ -119,7 +122,7 @@ public class PartidoDao {
             return new ArrayList<>();
         }
     }
-    
+
     public void guardar(List<Partido> lista) throws Exception {
         try (FileWriter fw = new FileWriter(file)) {
             gson.toJson(lista, fw);
