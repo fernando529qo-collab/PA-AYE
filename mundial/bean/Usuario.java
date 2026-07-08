@@ -1,16 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package mundial.bean;
-
-/**
- *
- * @author ferna
- */
 public abstract class Usuario {
-    
-    //Se declaro con protected para que solo las clases hijas puedan tenerlas y puedan ver
+    //Se declaro con protected para que solo las clases hijas AdministradorFIFA y DirectorFederacion puedan tenerlas y puedan ver
     protected String id;
     protected String nombre;
     protected String contraseña;

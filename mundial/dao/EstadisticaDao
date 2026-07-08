@@ -1,0 +1,15 @@
+
+package mundial.dao;
+import mundial.bean.Estadistica;
+import mundial.bean.Partido;
+ 
+
+public class EstadisticaDao {
+    public Estadistica obtenerLocal(Partido partido) {
+        return partido.getPartidoEstadisticas().get(0);
+    }
+ 
+    public Estadistica obtenerVisitante(Partido partido) {
+        return partido.getPartidoEstadisticas().get(1);
+    }
+}

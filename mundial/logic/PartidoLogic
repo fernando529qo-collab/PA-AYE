@@ -1,0 +1,108 @@
+package mundial.logic;
+ 
+import java.util.ArrayList;
+import java.util.List;
+import mundial.bean.EstadoPartido;
+import mundial.bean.Estadistica;
+import mundial.bean.Pais;
+import mundial.bean.Partido;
+import mundial.dao.PartidoDao;
+
+public class PartidoLogic {
+    private static PartidoDao partidoDao = new PartidoDao();
+
+
+    public static Partido simular(List<Pais> paises, String fecha) {
+        int punt1 = 0;
+        int punt2 = 0;
+        int ranking;
+        int suerte;
+        int estiloJuego = 0;
+        int probabilidadLocal;
+        int probabilidadVisitante;
+
+        //PUNTAJE LOCAL (Pais 0)
+        ranking = 211 - paises.get(0).getRankingFifa();
+        suerte = (int) (Math.random() * 21);
+        if (paises.get(0).getEstiloJuego().name().equalsIgnoreCase("OFENSIVO")) {
+            estiloJuego = 50;
+        }
+        if (paises.get(0).getEstiloJuego().name().equalsIgnoreCase("DEFENSIVO")) {
+            estiloJuego = 40;
+        }
+        if (paises.get(0).getEstiloJuego().name().equalsIgnoreCase("EQUILIBRADO")) {
+            estiloJuego = 30;
+        }
+        punt1 = ranking + suerte + estiloJuego;
+ 
+        //PUNTAJE VISITANTE (Pais 1)
+        ranking = 211 - paises.get(1).getRankingFifa();
+        suerte = (int) (Math.random() * 21);
+        if (paises.get(1).getEstiloJuego().name().equalsIgnoreCase("OFENSIVO")) {
+            estiloJuego = 50;
+        }
+        if (paises.get(1).getEstiloJuego().name().equalsIgnoreCase("DEFENSIVO")) {
+            estiloJuego = 40;
+        }
+        if (paises.get(1).getEstiloJuego().name().equalsIgnoreCase("EQUILIBRADO")) {
+            estiloJuego = 30;
+        }
+        punt2 = ranking + suerte + estiloJuego;
+ 
+        //CALCULO DE PROBABILIDADES
+        int suma = punt1 + punt2;
+        probabilidadLocal = Math.round((punt1 * 100.0f) / suma);
+        //El visitante = 100 - local, para GARANTIZAR que ambos sumen exactamente 100
+        probabilidadVisitante = 100 - probabilidadLocal;
+ 
+        //GENERACION DE GOLES A PARTIR DE LA PROBABILIDAD
+        int[] goles = generarGoles(probabilidadLocal, probabilidadVisitante);
+        int golesLocal = goles[0];
+        int golesVisitante = goles[1];
+ 
+        // --- CREACION DEL OBJETO PARTIDO ---
+        //Partido no tiene constructor vacio ni setPaisLocal/setPaisVisitante: los dos
+        //paises van en una lista, el primero SIEMPRE es el local.
+        List<Pais> partidoPais = new ArrayList<>();
+        partidoPais.add(paises.get(0)); //local
+        partidoPais.add(paises.get(1)); //visitante
+ 
+        Partido partidoSimulado = new Partido(fecha, golesLocal,golesVisitante, probabilidadLocal,probabilidadVisitante,partidoPais,EstadoPartido.FINALIZADO, new ArrayList<>());
+         try {
+            partidoDao.registrar(partidoSimulado);
+            System.out.println("Partido simulado y guardado con exito.");
+        } catch (Exception e) {
+            System.err.println("Error al guardar el partido simulado: " + e.getMessage());
+        }
+ 
+        return partidoSimulado;
+    }
+ 
+   
+    public static int[] generarGoles(int probabilidadLocal, int probabilidadVisitante) {
+        int golesMaximos = 5;
+        double promedioLocal = (probabilidadLocal / 100.0) * golesMaximos;
+        double promedioVisitante = (probabilidadVisitante / 100.0) * golesMaximos;
+        int golesLocal = generarGolesEquipo(promedioLocal, golesMaximos);
+        int golesVisitante = generarGolesEquipo(promedioVisitante, golesMaximos);
+        return new int[]{golesLocal, golesVisitante};
+    }
+ 
+    //Convierte un promedio de goles esperado en un numero real de goles,
+    //agregando variacion de -1, 0 o +1 gol y respetando el rango [0, golesMaximos]
+    private static int generarGolesEquipo(double promedioEsperado, int golesMaximos) {
+        int variacion = (int) (Math.random() * 3) - 1; // -1, 0 o 1
+        int goles = (int) Math.round(promedioEsperado) + variacion;
+        if (goles < 0) {
+            goles = 0;
+        }
+        if (goles > golesMaximos) {
+            goles = golesMaximos;
+        }
+        return goles;
+    }
+ 
+    public static List<Partido> listar() {
+        return partidoDao.mostrar();
+    }
+}
