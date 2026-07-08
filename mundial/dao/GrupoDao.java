@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package mundial.dao;
 
 import mundial.bean.Alineacion;
@@ -156,14 +152,22 @@ public class GrupoDao {
         return mismaConfederacion == 0;
     }
 
-    //Coloca automáticamente al anfitrión en el Grupo A
-    public static void colocarAnfitrion(ArrayList<Grupo> grupos, ArrayList<Pais> paises) {
-        Pais anfitrion = buscarPaisAnfitrion(paises);
-        if (anfitrion != null) {
-            Grupo grupoA = buscarGrupo(grupos, 'A');
-            if (grupoA != null) {
-                grupoA.getGrupoPaises().add(anfitrion);
-                anfitrion.setGrupo(grupoA);
+    //Coloca automáticamente al anfitrión en el Grupo A y lo retira de su bombo
+    //para que no vuelva a ser distribuido en otro grupo
+    public static void colocarAnfitrion(ArrayList<Grupo> grupos, ArrayList<ArrayList<Pais>> bombos) {
+        for (int i = 0; i < bombos.size(); i++) {
+            ArrayList<Pais> bombo = bombos.get(i);
+            for (int j = 0; j < bombo.size(); j++) {
+                Pais pais = bombo.get(j);
+                if (pais.isEsAnfitrion()) {
+                    Grupo grupoA = buscarGrupo(grupos, 'A');
+                    if (grupoA != null) {
+                        grupoA.getGrupoPaises().add(pais);
+                        pais.setGrupo(grupoA);
+                    }
+                    bombo.remove(j);
+                    return;
+                }
             }
         }
     }

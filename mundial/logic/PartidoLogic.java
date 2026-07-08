@@ -28,8 +28,12 @@ public class PartidoLogic {
         return partidoDao.eliminar(partido);
     }
 
-    public static List<Partido> buscarPorFase(RondaEliminacion rondaEliminacion) {
-        return partidoDao.buscarPorFase(rondaEliminacion);
+    public static List<Partido> buscarPorFaseEliminatoria(RondaEliminacion rondaEliminacion) {
+        return buscarPorFase(rondaEliminacion);
+    }
+
+    public static List<Partido> buscarPartidoPorGrupo(char codigo) {
+        return buscarPorGrupo(codigo);
     }
 
     public static Partido simularPartido(List<Pais> paises, RondaEliminacion fase) throws Exception {
@@ -46,6 +50,33 @@ public class PartidoLogic {
 
     public static void setLstPartidos(List<Partido> lstPartidos) {
         partidoDao.setLstPartidos(lstPartidos);
+    }
+
+    public static List<Partido> buscarPorGrupo(char codigo) {
+        int pos = 0;
+        List<Partido> lstPartidosEncotrados = new ArrayList<>();
+        for (Partido p : mostrarPartidos()) {
+            if (codigo != 0 && codigo == p.getAlineaciones().get(pos).getPais().getGrupo().getCodigo()) {
+                lstPartidosEncotrados.add(p);
+            }
+            pos++;
+        }
+        return lstPartidosEncotrados;
+    }
+    
+    public static List<Partido> buscarPorFase(RondaEliminacion rondaEliminacion) {
+        int pos = 0;
+        List<Partido> lstPartidosEscontrados = new ArrayList<>();
+        Bracket fase = new Bracket();
+        for (Partido p : mostrarPartidos()) {
+            if (fase.getBracketPartidos().get(pos) == p) {
+                if (fase.getRonda().name().equalsIgnoreCase(rondaEliminacion.name())) {
+                    lstPartidosEscontrados.add(p);
+                }
+            }
+            pos++;
+        }
+        return lstPartidosEscontrados;
     }
 
 //Crea o simula un solo partido
