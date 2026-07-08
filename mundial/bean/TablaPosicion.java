@@ -9,28 +9,39 @@ package mundial.bean;
  * @author ferna
  */
 public class TablaPosicion {
-    
+   private Pais pais;
     private int partidosJugados;
     private int partidosGanados;
     private int partidosEmpatados;
     private int partidosPerdidos;
     private int golesFavor;
     private int golesContra;
-    private int puntos;
+    //
     private int diferenciaGoles;
-    private Pais pais;
+    private int puntos;
 
-    public TablaPosicion() {}
+    public TablaPosicion() {
+
+    }
 
     public TablaPosicion(Pais pais) {
+
+        this.pais = pais;
         this.partidosJugados = 0;
         this.partidosGanados = 0;
         this.partidosEmpatados = 0;
         this.partidosPerdidos = 0;
         this.golesFavor = 0;
         this.golesContra = 0;
-        this.puntos = 0;
         this.diferenciaGoles = 0;
+        this.puntos = 0;
+    }
+
+    public Pais getPais() {
+        return pais;
+    }
+
+    public void setPais(Pais pais) {
         this.pais = pais;
     }
 
@@ -82,13 +93,6 @@ public class TablaPosicion {
         this.golesContra = golesContra;
     }
 
-    public int getPuntos() {
-        return puntos;
-    }
-
-    public void setPuntos(int puntos) {
-        this.puntos = puntos;
-    }
     public int getDiferenciaGoles() {
         return diferenciaGoles;
     }
@@ -97,16 +101,28 @@ public class TablaPosicion {
         this.diferenciaGoles = diferenciaGoles;
     }
 
-    public Pais getPais() {
-        return pais;
+    public int getPuntos() {
+        return puntos;
     }
 
-    public void setPais(Pais pais) {
-        this.pais = pais;
+    public void setPuntos(int puntos) {
+        this.puntos = puntos;
     }
 
     @Override
     public String toString() {
-        return "TablaPosicion{" + "partidosJugados=" + partidosJugados + ", partidosGanados=" + partidosGanados + ", partidosEmpatados=" + partidosEmpatados + ", partidosPerdidos=" + partidosPerdidos + ", golesFavor=" + golesFavor + ", golesContra=" + golesContra + ", diferenciaGoles= "+ diferenciaGoles + ", puntos=" + puntos + ", pais=" + pais + '}';
+        return "TablaPosicion{" +
+                "pais=" + pais +
+                ", PJ=" + partidosJugados +
+                ", PG=" + partidosGanados +
+                ", PE=" + partidosEmpatados +
+                ", PP=" + partidosPerdidos +
+                ", GF=" + golesFavor +
+                ", GC=" + golesContra +
+                ", DG=" + diferenciaGoles +
+                ", PTS=" + puntos +
+                '}';
     }
+ 
+    
 }
