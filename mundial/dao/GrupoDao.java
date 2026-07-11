@@ -1,23 +1,35 @@
-package mundial.dao;
+package dao;
 
-import mundial.bean.Alineacion;
-import mundial.bean.EstadoPartido;
-import mundial.bean.Grupo;
-import mundial.bean.Pais;
-import mundial.bean.Partido;
-import mundial.bean.TablaPosicion;
+import bean.Grupo;
+import bean.TablaPosicion;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author ACER
  */
 public class GrupoDao {
-  
-    //Busca la posición de un grupo según su código
-    public static int buscarPosicionGrupo(ArrayList<Grupo> grupos, char codigo) {
-        for (int i = 0; i < grupos.size(); i++) {
-            if (grupos.get(i).getCodigo() == codigo) {
+
+    private ArrayList<Grupo> lstGrupos;
+
+    private PaisDao paisDao = new PaisDao();
+
+    private Gson gson = new Gson();
+    private File file = new File("GRUPOS.json");
+
+    public GrupoDao() {
+        lstGrupos = leer();
+    }
+
+    //Busca la posición de un grupo
+    public int buscarPos(char codigo) {
+        for (int i = 0; i < lstGrupos.size(); i++) {
+            if (lstGrupos.get(i).getCodigo() == codigo) {
                 return i;
             }
         }
@@ -25,347 +37,223 @@ public class GrupoDao {
     }
 
     //Busca un grupo por su código
-    public static Grupo buscarGrupo(ArrayList<Grupo> grupos, char codigo) {
-        for (int i = 0; i < grupos.size(); i++) {
-            if (grupos.get(i).getCodigo() == codigo) {
-                return grupos.get(i);
-            }
+    public Grupo buscarObj(char codigo) {
+        int pos = buscarPos(codigo);
+        if (pos != -1) {
+            return lstGrupos.get(pos);
         }
         return null;
     }
 
     //Registra un grupo
-    public static void registrarGrupo(ArrayList<Grupo> grupos, Grupo grupo) {
-        if (buscarPosicionGrupo(grupos, grupo.getCodigo()) == -1) {
-            grupos.add(grupo);
+    public boolean registrar(Grupo grupo) throws Exception {
+        if (buscarPos(grupo.getCodigo()) == -1) {
+            lstGrupos.add(grupo);
+            guardar(lstGrupos);
+            return true;
         }
+        return false;
     }
 
     //Actualiza un grupo
-    public static void actualizarGrupo(ArrayList<Grupo> grupos, Grupo grupo) {
-        int pos = buscarPosicionGrupo(grupos, grupo.getCodigo());
+    public boolean actualizar(Grupo grupo) throws Exception {
+        int pos = buscarPos(grupo.getCodigo());
         if (pos != -1) {
-            grupos.set(pos, grupo);
+            lstGrupos.set(pos, grupo);
+            guardar(lstGrupos);
+            return true;
         }
+        return false;
     }
 
     //Elimina un grupo
-    public static void eliminarGrupo(ArrayList<Grupo> grupos, char codigo) {
-        int pos = buscarPosicionGrupo(grupos, codigo);
+    public boolean eliminar(char codigo) throws Exception {
+        int pos = buscarPos(codigo);
         if (pos != -1) {
-            grupos.remove(pos);
+            lstGrupos.remove(pos);
+            guardar(lstGrupos);
+            return true;
         }
+        return false;
     }
 
-    //Muestra todos los grupos registrados
-    public static ArrayList<Grupo> mostrarGrupos(ArrayList<Grupo> grupos) {
-        return grupos;
+    //Muestra todos los grupos
+    public ArrayList<Grupo> mostrar() {
+        return lstGrupos;
     }
-
-    //Obtiene un país por su id
-    public static Pais buscarPais(ArrayList<Pais> paises, String id) {
-        for (int i = 0; i < paises.size(); i++) {
-            if (paises.get(i).getId().equalsIgnoreCase(id)) {
-                return paises.get(i);
-            }
-        }
-        return null;
-    }
-
-    //Ordena los países por Ranking FIFA
-    public static void ordenarPaisesPorRanking(ArrayList<Pais> paises) {
+    
+    //Ordena los países registrados según el Ranking FIFA
+    public void ordenarPaisesPorRanking() {
+        ArrayList<Pais> paises = new ArrayList<>(paisDao.mostrar());
         for (int i = 0; i < paises.size() - 1; i++) {
             for (int j = i + 1; j < paises.size(); j++) {
-                if (paises.get(i).getRankingFifa() > paises.get(j).getRankingFifa()) {
+                if (paises.get(j).getRankingFifa() < paises.get(i).getRankingFifa()) {
                     Pais aux = paises.get(i);
                     paises.set(i, paises.get(j));
                     paises.set(j, aux);
                 }
             }
         }
+        paisDao.setLstPaises(paises);
     }
 
-    //Busca al país anfitrión
-    public static Pais buscarPaisAnfitrion(ArrayList<Pais> paises) {
-        for (int i = 0; i < paises.size(); i++) {
-            if (paises.get(i).isEsAnfitrion()) {
-                return paises.get(i);
-            }
-        }
-        return null;
-    }
-
-    //Limpia todos los grupos antes de un nuevo sorteo
-    public static void limpiarGrupos(ArrayList<Grupo> grupos) {
-        for (int i = 0; i < grupos.size(); i++) {
-            grupos.get(i).getGrupoPaises().clear();
-            grupos.get(i).getTabla().clear();
-            if (grupos.get(i).getEncuentros() != null) {
-                grupos.get(i).getEncuentros().clear();
-            }
-        }
-    }
-    //Crea los bombos utilizando el Ranking FIFA
-
-    public static ArrayList<ArrayList<Pais>> crearBombos(ArrayList<Pais> paises) {
+    //Genera los cuatro bombos según el Ranking FIFA
+    private ArrayList<ArrayList<Pais>> generarBombos() {
+        ordenarPaisesPorRanking();
+        ArrayList<Pais> paises = new ArrayList<>(paisDao.mostrar());
         ArrayList<ArrayList<Pais>> bombos = new ArrayList<>();
-        ordenarPaisesPorRanking(paises);
-        int cantidadBombos = 4;
-        int paisesPorBombo = paises.size() / cantidadBombos;
+
         int indice = 0;
-        for (int i = 0; i < cantidadBombos; i++) {
+
+        for (int i = 0; i < 4; i++) {
             ArrayList<Pais> bombo = new ArrayList<>();
-            for (int j = 0; j < paisesPorBombo; j++) {
+            for (int j = 0; j < 12; j++) {
                 bombo.add(paises.get(indice));
                 indice++;
             }
             bombos.add(bombo);
         }
+
         return bombos;
     }
 
-    //Mezcla los países de cada bombo
-    public static void mezclarBombos(ArrayList<ArrayList<Pais>> bombos) {
+    //Limpia la información de todos los grupos
+    public void limpiarGrupos() throws Exception {
+        for (int i = 0; i < lstGrupos.size(); i++) {
+            lstGrupos.get(i).getGrupoPaises().clear();
+            lstGrupos.get(i).getTabla().clear();
+            lstGrupos.get(i).getEncuentros().clear();
+        }
+        guardar(lstGrupos);
+    }
+
+    //Realiza el sorteo aleatorio de los grupos
+    public void sortearGrupos() throws Exception {
+        limpiarGrupos();
+        ArrayList<ArrayList<Pais>> bombos = generarBombos();
         for (int i = 0; i < bombos.size(); i++) {
             ArrayList<Pais> bombo = bombos.get(i);
-            for (int j = 0; j < bombo.size(); j++) {
+            for (int j = 0; j < lstGrupos.size(); j++) {
                 int aleatorio = (int) (Math.random() * bombo.size());
-                Pais aux = bombo.get(j);
-                bombo.set(j, bombo.get(aleatorio));
-                bombo.set(aleatorio, aux);
+                Pais pais = bombo.remove(aleatorio);
+                lstGrupos.get(j).getGrupoPaises().add(pais);
+                pais.setGrupo(lstGrupos.get(j));
             }
         }
+        guardar(lstGrupos);
     }
-
-    //Verifica si un país puede ingresar al grupo
-    public static boolean validarConfederacion(Grupo grupo, Pais pais) {
-        int mismaConfederacion = 0;
-        for (int i = 0; i < grupo.getGrupoPaises().size(); i++) {
-            Pais p = grupo.getGrupoPaises().get(i);
-            if (p.getConfederacion() == pais.getConfederacion()) {
-                mismaConfederacion++;
-            }
-        }
-        if (pais.getConfederacion().name().equalsIgnoreCase("UEFA")) {
-            return mismaConfederacion < 2;
-        }
-        return mismaConfederacion == 0;
-    }
-
-    //Coloca automáticamente al anfitrión en el Grupo A y lo retira de su bombo
-    //para que no vuelva a ser distribuido en otro grupo
-    public static void colocarAnfitrion(ArrayList<Grupo> grupos, ArrayList<ArrayList<Pais>> bombos) {
-        for (int i = 0; i < bombos.size(); i++) {
-            ArrayList<Pais> bombo = bombos.get(i);
-            for (int j = 0; j < bombo.size(); j++) {
-                Pais pais = bombo.get(j);
-                if (pais.isEsAnfitrion()) {
-                    Grupo grupoA = buscarGrupo(grupos, 'A');
-                    if (grupoA != null) {
-                        grupoA.getGrupoPaises().add(pais);
-                        pais.setGrupo(grupoA);
-                    }
-                    bombo.remove(j);
-                    return;
-                }
-            }
-        }
-    }
-
-    //Crea la tabla de posiciones de cada grupo
-    public static void crearTablaGrupo(ArrayList<Grupo> grupos) {
-        for (int i = 0; i < grupos.size(); i++) {
-            Grupo grupo = grupos.get(i);
-            grupo.getTabla().clear();
-            for (int j = 0; j < grupo.getGrupoPaises().size(); j++) {
-                TablaPosicion tabla = new TablaPosicion(grupo.getGrupoPaises().get(j));
-                grupo.getTabla().add(tabla);
-            }
-        }
-    }
-
+        
     //Genera los encuentros de todos los grupos
-    public static void generarEncuentrosGrupos(ArrayList<Grupo> grupos) {
-        for (int i = 0; i < grupos.size(); i++) {
-            Grupo grupo = grupos.get(i);
+    public void generarEncuentros() throws Exception {
+        for (int i = 0; i < lstGrupos.size(); i++) {
+
+            Grupo grupo = lstGrupos.get(i);
             grupo.getEncuentros().clear();
-            ArrayList<Pais> paises = new ArrayList<>(grupo.getGrupoPaises());
+
+            ArrayList<Pais> paises = grupo.getGrupoPaises();
+
+            int numeroPartido = 1;
+
             for (int j = 0; j < paises.size() - 1; j++) {
                 for (int k = j + 1; k < paises.size(); k++) {
-                    Pais local = paises.get(j);
-                    Pais visitante = paises.get(k);
-                    Partido partido = new Partido("", "", 0, 0, 0, 0, new ArrayList<>(), EstadoPartido.PENDIENTE);
-                    Alineacion alineacionLocal = new Alineacion(partido, local);
-                    Alineacion alineacionVisitante = new Alineacion(partido, visitante);
-                    partido.getAlineaciones().add(alineacionLocal);
-                    partido.getAlineaciones().add(alineacionVisitante);
+
+                    Partido partido = new Partido();
+                    partido.setId("P" + grupo.getCodigo() + numeroPartido);
+
+                    Alineacion local = new Alineacion(partido, paises.get(j));
+                    Alineacion visitante = new Alineacion(partido, paises.get(k));
+
+                    ArrayList<Alineacion> alineaciones = new ArrayList<>();
+                    alineaciones.add(local);
+                    alineaciones.add(visitante);
+
+                    partido.setAlineaciones(alineaciones);
+
                     grupo.getEncuentros().add(partido);
+
+                    numeroPartido++;
                 }
             }
         }
+
+        guardar(lstGrupos);
     }
 
-    //Muestra todos los encuentros de un grupo
-    public static ArrayList<Partido> mostrarEncuentrosGrupo(Grupo grupo) {
-        return new ArrayList<>(grupo.getEncuentros());
-    }
-
-    //Busca un encuentro por posición
-    public static Partido buscarEncuentro(Grupo grupo, int posicion) {
-        if (posicion >= 0 && posicion < grupo.getEncuentros().size()) {
-            return grupo.getEncuentros().get(posicion);
+    //Muestra los encuentros de un grupo
+    public ArrayList<Partido> mostrarEncuentros(char codigoGrupo) {
+        Grupo grupo = buscarObj(codigoGrupo);
+        if (grupo != null) {
+            return new ArrayList<>((ArrayList<Partido>) grupo.getEncuentros());
         }
-        return null;
+        return new ArrayList<>();
     }
 
-    //Muestra la tabla de posiciones de un grupo
-    public static ArrayList<TablaPosicion> mostrarTablaGrupo(Grupo grupo) {
-        return new ArrayList<>(grupo.getTabla());
-    }
+    //Muestra todos los encuentros del torneo
+    public ArrayList<Partido> mostrarEncuentrosTotales() {
+        ArrayList<Partido> partidos = new ArrayList<>();
 
-    //Obtiene el primer lugar del grupo
-    public static Pais obtenerPrimerLugarGrupo(Grupo grupo) {
-        TablaPosicion tabla = TablaPosicionDao.obtenerPrimerLugar(grupo);
-        if (tabla != null) {
-            return tabla.getPais();
+        for (int i = 0; i < lstGrupos.size(); i++) {
+            partidos.addAll(lstGrupos.get(i).getEncuentros());
         }
-        return null;
+
+        return partidos;
     }
 
-    //Obtiene el segundo lugar del grupo
-    public static Pais obtenerSegundoLugarGrupo(Grupo grupo) {
-        TablaPosicion tabla = TablaPosicionDao.obtenerSegundoLugar(grupo);
-        if (tabla != null) {
-            return tabla.getPais();
+    //Crea las tablas de posiciones de todos los grupos
+    public void crearTablasPosiciones() throws Exception {
+        for (int i = 0; i < lstGrupos.size(); i++) {
+            TablaPosicionDao.crearTablaPosiciones(lstGrupos.get(i));
         }
-        return null;
-    }
+        guardar(lstGrupos);
+    }    
+        
+    //Lee los grupos almacenados
+    public ArrayList<Grupo> leer() {
+        try {
+            ArrayList<Grupo> grupos;
 
-    //Obtiene el tercer lugar del grupo
-    public static Pais obtenerTercerLugarGrupo(Grupo grupo) {
-        TablaPosicion tabla = TablaPosicionDao.obtenerTercerLugar(grupo);
-        if (tabla != null) {
-            return tabla.getPais();
-        }
-        return null;
-    }
-
-    //Obtiene todos los primeros lugares
-    public static ArrayList<Pais> obtenerPrimerosLugares(ArrayList<Grupo> grupos) {
-        ArrayList<Pais> primeros = new ArrayList<>();
-        for (int i = 0; i < grupos.size(); i++) {
-            Pais pais = obtenerPrimerLugarGrupo(grupos.get(i));
-            if (pais != null) {
-                primeros.add(pais);
+            if (!file.exists()) {
+                return new ArrayList<>();
             }
-        }
-        return primeros;
-    }
 
-    //Obtiene todos los segundos lugares
-    public static ArrayList<Pais> obtenerSegundosLugares(ArrayList<Grupo> grupos) {
-        ArrayList<Pais> segundos = new ArrayList<>();
-        for (int i = 0; i < grupos.size(); i++) {
-            Pais pais = obtenerSegundoLugarGrupo(grupos.get(i));
-            if (pais != null) {
-                segundos.add(pais);
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                grupos = gson.fromJson(br, new TypeToken<ArrayList<Grupo>>() {
+                }.getType());
             }
-        }
-        return segundos;
-    }
 
-    //Obtiene todos los terceros lugares
-    public static ArrayList<Pais> obtenerTercerosLugares(ArrayList<Grupo> grupos) {
-        ArrayList<Pais> terceros = new ArrayList<>();
-        for (int i = 0; i < grupos.size(); i++) {
-            Pais pais = obtenerTercerLugarGrupo(grupos.get(i));
-            if (pais != null) {
-                terceros.add(pais);
+            if (grupos == null) {
+                grupos = new ArrayList<>();
             }
-        }
-        return terceros;
-    }
-    //Compara los terceros lugares
 
-    public static void compararMejoresTerceros(ArrayList<TablaPosicion> terceros) {
-        for (int i = 0; i < terceros.size() - 1; i++) {
-            for (int j = i + 1; j < terceros.size(); j++) {
-                TablaPosicion t1 = terceros.get(i);
-                TablaPosicion t2 = terceros.get(j);
-                boolean cambiar = false;
-                if (t2.getPuntos() > t1.getPuntos()) {
-                    cambiar = true;
-                } else if (t2.getPuntos() == t1.getPuntos()) {
-                    if (t2.getDiferenciaGoles() > t1.getDiferenciaGoles()) {
-                        cambiar = true;
-                    } else if (t2.getDiferenciaGoles() == t1.getDiferenciaGoles()) {
-                        if (t2.getGolesFavor() > t1.getGolesFavor()) {
-                            cambiar = true;
-                        }
-                    }
-                }
-                if (cambiar) {
-                    TablaPosicion aux = terceros.get(i);
-                    terceros.set(i, terceros.get(j));
-                    terceros.set(j, aux);
-                }
-            }
+            return grupos;
+
+        } catch (Exception e) {
+            return new ArrayList<>();
         }
     }
 
-    //Obtiene los 8 mejores terceros
-    public static ArrayList<Pais> obtenerMejoresTerceros(ArrayList<Grupo> grupos) {
-        ArrayList<TablaPosicion> terceros = new ArrayList<>();
-        for (int i = 0; i < grupos.size(); i++) {
-            TablaPosicion tercero = TablaPosicionDao.obtenerTercerLugar(grupos.get(i));
-            if (tercero != null) {
-                terceros.add(tercero);
-            }
+    //Guarda los grupos
+    public void guardar(ArrayList<Grupo> lista) throws Exception {
+        try (FileWriter fw = new FileWriter(file)) {
+            gson.toJson(lista, fw);
+        } catch (Exception e) {
+            throw e;
         }
-
-        compararMejoresTerceros(terceros);
-        ArrayList<Pais> mejores = new ArrayList<>();
-        for (int i = 0; i < 8 && i < terceros.size(); i++) {
-            mejores.add(terceros.get(i).getPais());
-        }
-        return mejores;
     }
 
-    //Obtiene los 32 clasificados
-    public static ArrayList<Pais> obtenerClasificadosMundial(ArrayList<Grupo> grupos) {
-        ArrayList<Pais> clasificados = new ArrayList<>();
-        clasificados.addAll(obtenerPrimerosLugares(grupos));
-        clasificados.addAll(obtenerSegundosLugares(grupos));
-        clasificados.addAll(obtenerMejoresTerceros(grupos));
-        return clasificados;
+    //Obtiene la cantidad de grupos registrados
+    public int cantidadGrupos() {
+        return lstGrupos.size();
     }
-    
-    //Realiza el sorteo de los grupos
-    public static void sortearGrupos(ArrayList<Grupo> grupos, ArrayList<Pais> paises) {
-        limpiarGrupos(grupos);
-        ArrayList<ArrayList<Pais>> bombos = crearBombos(paises);
-        mezclarBombos(bombos);
-        colocarAnfitrion(grupos, bombos);
 
-        for (int i = 0; i < bombos.size(); i++) {
-            ArrayList<Pais> bombo = bombos.get(i);
-            for (int j = 0; j < grupos.size(); j++) {
-                Grupo grupo = grupos.get(j);
-                if (grupo.getGrupoPaises().size() > i) {
-                    continue;
-                }
-                for (int k = 0; k < bombo.size(); k++) {
-                    Pais pais = bombo.get(k);
-                    if (validarConfederacion(grupo, pais)) {
-                        grupo.getGrupoPaises().add(pais);
-                        pais.setGrupo(grupo);
-                        bombo.remove(k);
-                        break;
-                    }
-                }
-            }
-        }
-        crearTablaGrupo(grupos);
-        generarEncuentrosGrupos(grupos);
-    } 
+    //Verifica si un grupo existe
+    public boolean existeGrupo(char codigo) {
+        return buscarPos(codigo) != -1;
+    }
+
+    //Elimina todos los grupos
+    public void limpiarRegistroGrupos() throws Exception {
+        lstGrupos.clear();
+        guardar(lstGrupos);
+    }
 }
