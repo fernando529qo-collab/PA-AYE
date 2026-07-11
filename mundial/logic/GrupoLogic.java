@@ -5,188 +5,131 @@
 package mundial.logic;
 
 import mundial.dao.GrupoDao;
+import mundial.dao.TablaPosicionDao;
 import mundial.bean.Grupo;
-import mundial.bean.Pais;
 import mundial.bean.Partido;
-import mundial.bean.TablaPosicion;
+import mundial.bean.Pais;
 import java.util.ArrayList;
-import java.util.List;
 
-/**
- *
- * @author ACER
- */
 public class GrupoLogic {
+    private static GrupoDao grupoDao = new GrupoDao();
+    private static TablaPosicionDao tablaDao = new TablaPosicionDao();
 
-    //Registra un grupo
-    public static String registrarGrupo(ArrayList<Grupo> grupos, Grupo grupo) {
+    // Verifica la existencia de un grupo por su código único
+    public static boolean validarGrupo(char codigo) {
+        return grupoDao.existeGrupo(codigo);
+    }
+
+    // Busca y obtiene un objeto Grupo específico
+    public static Grupo buscarGrupo(char codigo) {
+        return grupoDao.buscarObj(codigo);
+    }
+
+    // Registra un nuevo grupo si su código no está duplicado
+    public static boolean registrarGrupo(Grupo grupo) {
         try {
-            if (grupo == null) {
-                return "Debe ingresar un grupo.";
+            if (validarGrupo(grupo.getCodigo())) return false;
+            return grupoDao.registrar(grupo);
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    // Actualiza los datos modificados de un grupo en el archivo de persistencia
+    public static boolean actualizarGrupo(Grupo grupo) {
+        try {
+            if (!validarGrupo(grupo.getCodigo())) return false;
+            return grupoDao.actualizar(grupo);
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    // Remueve un grupo del sistema mediante su código
+    public static boolean eliminarGrupo(char codigo) {
+        try {
+            if (!validarGrupo(codigo)) return false;
+            return grupoDao.eliminar(codigo);
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    // Obtiene la lista completa de todos los grupos registrados
+    public static ArrayList<Grupo> obtenerTodosLosGrupos() {
+        return grupoDao.mostrar();
+    }
+
+    // Retorna la cantidad total de grupos almacenados
+    public static int obtenerCantidadGrupos() {
+        return grupoDao.cantidadGrupos();
+    }
+
+    // Ejecuta de forma secuencial el sorteo, la creación de fixtures y la inicialización de tablas[cite: 1, 2]
+    public static boolean ejecutarSorteoOficial() {
+        try {
+            grupoDao.sortearGrupos();
+            grupoDao.generarEncuentros();
+            grupoDao.crearTablasPosiciones();
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    // Procesa el algoritmo matemático determinista del partido e impacta los resultados en la tabla[cite: 1, 2]
+    public static boolean simularPartidoIndividual(Grupo grupo, Partido partido) {
+        try {
+            if (grupo == null || partido == null) return false;
+            Pais local = partido.getAlineaciones().get(0).getPais();
+            Pais visitante = partido.getAlineaciones().get(1).getPais();
+            double poderLocal = (200 - local.getRankingFifa()) + local.getAtaque() + local.getDefensa() + (Math.random() * 50);
+            double poderVisitante = (200 - visitante.getRankingFifa()) + visitante.getAtaque() + visitante.getDefensa() + (Math.random() * 50);
+            int golesLocal = (int) Math.max(0, (poderLocal - poderVisitante) / 30 + (Math.random() * 3));
+            int golesVisitante = (int) Math.max(0, (poderVisitante - poderLocal) / 30 + (Math.random() * 3));
+            partido.setGolesLocal(golesLocal);
+            partido.setGolesVisitante(golesVisitante);
+            tablaDao.actualizarTablaPosiciones(grupo, partido);
+            grupoDao.actualizar(grupo);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    // Simula en lote todos los encuentros pendientes correspondientes a una jornada[cite: 1]
+    public static boolean simularJornadaCompleta(Grupo grupo) {
+        try {
+            if (grupo == null) return false;
+            ArrayList<Partido> encuentros = (ArrayList<Partido>) grupo.getEncuentros();
+            for (Partido partido : encuentros) {
+                if (partido.getGolesLocal() == 0 && partido.getGolesVisitante() == 0) {
+                    simularPartidoIndividual(grupo, partido);
+                }
             }
-            if (GrupoDao.buscarGrupo(grupos, grupo.getCodigo()) != null) {
-                return "El grupo ya existe.";
-            }
-            GrupoDao.registrarGrupo(grupos, grupo);
-            return "Grupo registrado correctamente.";
-        } catch (Exception e) {
-            return e.getMessage();
+            return true;
+        } catch (Exception ex) {
+            return false;
         }
     }
 
-    //Actualiza un grupo
-    public static String actualizarGrupo(ArrayList<Grupo> grupos, Grupo grupo) {
+    // Obtiene la lista de encuentros programados para un grupo en específico[cite: 1]
+    public static ArrayList<Partido> obtenerEncuentrosPorGrupo(char codigoGrupo) {
+        return grupoDao.mostrarEncuentros(codigoGrupo);
+    }
+
+    // Obtiene el fixture absoluto con todos los partidos del torneo[cite: 1]
+    public static ArrayList<Partido> obtenerEncuentrosTotales() {
+        return grupoDao.mostrarEncuentrosTotales();
+    }
+
+    // Ejecuta el restablecimiento completo borrando el registro de grupos del torneo[cite: 1]
+    public static boolean reiniciarRegistroTorneo() {
         try {
-            if (grupo == null) {
-                return "Debe ingresar un grupo.";
-            }
-            if (GrupoDao.buscarGrupo(grupos, grupo.getCodigo()) == null) {
-                return "El grupo no existe.";
-            }
-            GrupoDao.actualizarGrupo(grupos, grupo);
-            return "Grupo actualizado correctamente.";
-        } catch (Exception e) {
-            return e.getMessage();
+            grupoDao.limpiarRegistroGrupos();
+            return true;
+        } catch (Exception ex) {
+            return false;
         }
     }
-
-    //Elimina un grupo
-    public static String eliminarGrupo(ArrayList<Grupo> grupos, char codigo) {
-        try {
-            if (GrupoDao.buscarGrupo(grupos, codigo) == null) {
-                return "El grupo no existe.";
-            }
-            GrupoDao.eliminarGrupo(grupos, codigo);
-            return "Grupo eliminado correctamente.";
-        } catch (Exception e) {
-            return e.getMessage();
-        }
-    }
-
-    //Lista todos los grupos
-    public static ArrayList<Grupo> listarGrupos(ArrayList<Grupo> grupos) {
-        try {
-            return GrupoDao.mostrarGrupos(grupos);
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
-    //Realiza el sorteo de los grupos
-
-    public static String sortearGrupos(ArrayList<Grupo> grupos, ArrayList<Pais> paises) {
-        try {
-            if (grupos.isEmpty()) {
-                return "No existen grupos registrados.";
-            }
-            if (paises.isEmpty()) {
-                return "No existen países registrados.";
-            }
-            GrupoDao.sortearGrupos(grupos, paises);
-            return "Sorteo realizado correctamente.";
-        } catch (Exception e) {
-            return e.getMessage();
-        }
-    }
-
-    //Crea la tabla de posiciones de todos los grupos
-    public static String crearTablaGrupo(ArrayList<Grupo> grupos) {
-        try {
-            if (grupos.isEmpty()) {
-                return "No existen grupos registrados.";
-            }
-            GrupoDao.crearTablaGrupo(grupos);
-            return "Tabla de posiciones creada correctamente.";
-        } catch (Exception e) {
-            return e.getMessage();
-        }
-    }
-
-    //Genera los encuentros de todos los grupos
-    public static String generarEncuentrosGrupos(ArrayList<Grupo> grupos) {
-        try {
-            if (grupos.isEmpty()) {
-                return "No existen grupos registrados.";
-            }
-            GrupoDao.generarEncuentrosGrupos(grupos);
-            return "Encuentros generados correctamente.";
-        } catch (Exception e) {
-            return e.getMessage();
-        }
-    }
-
-    //Lista los encuentros de un grupo
-    public static ArrayList<Partido> listarEncuentrosGrupo(Grupo grupo) {
-        try {
-            if (grupo == null) {
-                return new ArrayList<>();
-            }
-            return GrupoDao.mostrarEncuentrosGrupo(grupo);
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
-
-    //Inicializa toda la fase de grupos
-    public static String inicializarFaseGrupos(ArrayList<Grupo> grupos, ArrayList<Pais> paises) {
-        try {
-            if (grupos.isEmpty()) {
-                return "No existen grupos registrados.";
-            }
-            if (paises.isEmpty()) {
-                return "No existen países registrados.";
-            }
-            //sortearGrupos ya arma la tabla de posiciones y genera los
-            //encuentros internamente, no hace falta repetirlo aquí
-            GrupoDao.sortearGrupos(grupos, paises);
-            return "La fase de grupos fue inicializada correctamente.";
-        } catch (Exception e) {
-            return e.getMessage();
-        }
-    }
-
-    //Obtiene los primeros lugares
-    public static ArrayList<Pais> obtenerPrimerosLugares(ArrayList<Grupo> grupos) {
-        try {
-            return GrupoDao.obtenerPrimerosLugares(grupos);
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
-
-    //Obtiene los segundos lugares
-    public static ArrayList<Pais> obtenerSegundosLugares(ArrayList<Grupo> grupos) {
-        try {
-            return GrupoDao.obtenerSegundosLugares(grupos);
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
-
-    //Obtiene los terceros lugares
-    public static ArrayList<Pais> obtenerTercerosLugares(ArrayList<Grupo> grupos) {
-        try {
-            return GrupoDao.obtenerTercerosLugares(grupos);
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
-
-    //Obtiene los mejores terceros
-    public static ArrayList<Pais> obtenerMejoresTerceros(ArrayList<Grupo> grupos) {
-        try {
-            return GrupoDao.obtenerMejoresTerceros(grupos);
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
-
-    //Obtiene los 32 clasificados
-    public static ArrayList<Pais> obtenerClasificadosMundial(ArrayList<Grupo> grupos) {
-        try {
-            return GrupoDao.obtenerClasificadosMundial(grupos);
-        } catch (Exception e) {
-            return new ArrayList<>();
-        }
-    }
-
 }
