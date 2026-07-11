@@ -21,6 +21,8 @@ public class Partido {
     private List<Alineacion> alineaciones; //La primera alineacion es del local
     private EstadoPartido estado;
 
+    public Partido() {}
+
     public Partido(String id, String fecha, int golesLocal, int golesVisitante, int probabilidadVictoriaLocal, int probabilidadVictoriaVisitante, List<Alineacion> alineaciones, EstadoPartido estado) {
         this.id = id;
         this.fecha = fecha;

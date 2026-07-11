@@ -2,14 +2,20 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Dao;
+package mundial.dao;
 
-import bean.Grupo;
-import bean.TablaPosicion;
+import mundial.bean.Grupo;
+import mundial.bean.Pais;
+import mundial.bean.Partido;
+import mundial.bean.TablaPosicion;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 /**
  *

@@ -1,13 +1,19 @@
-package dao;
+package mundial.dao;
 
-import bean.Grupo;
-import bean.TablaPosicion;
+import mundial.bean.Alineacion;
+import mundial.bean.Grupo;
+import mundial.bean.Pais;
+import mundial.bean.Partido;
+import mundial.bean.TablaPosicion;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 /**
  *
@@ -200,7 +206,7 @@ public class GrupoDao {
     }
 
     //Crea las tablas de posiciones de todos los grupos
-    public void crearTablasPosiciones() throws Exception {
+    public void crearTablasPosicionesEquipos() throws Exception {
         for (int i = 0; i < lstGrupos.size(); i++) {
             TablaPosicionDao.crearTablaPosiciones(lstGrupos.get(i));
         }
